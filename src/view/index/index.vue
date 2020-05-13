@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-        <van-nav-bar title="默默道具城"/>
+        <van-nav-bar title="momo道具城"/>
         <list-component></list-component>
   </div>
 </template>

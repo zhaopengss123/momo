@@ -12,10 +12,14 @@
               <li>
                   <img :src="'https://www.baidu.com/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png'">
                   <div class="list-text">
-                      <p></p>
-                      <p></p>
-                      <p></p>
+                      <p>可乐</p>
+                      <p>最酷炫的道具之一</p>
+                      <p>1分钟前 · 挽裤脚</p>
                   </div>
+                   <div class="right-pirce">
+                      <p>¥100</p>
+                      <p>库存100</p>
+                  </div>                 
               </li>
           </ul>
       </div>
@@ -63,9 +67,47 @@ export default {
   .list-main{
       width: 100%;
       ul>li{
+          overflow: hidden;
+          padding-top: 19px;
+          padding-bottom: 7px;
           img{
-              
+              width: 60px;
+              height: 60px;
+              border-radius: 10px;
+              box-shadow: 0px 0px 5px #ccc;
+              float: left;
+              margin-left: 5px;
           }
+         .list-text{
+             color: #9096A9;
+             font-size:12px;
+             width: 200px;
+             float:left;
+             margin-left:10px;
+             p:nth-child(1){
+                 color: #101010;
+                 font-size: 16px;
+                 font-weight: bold;
+             }
+             p:nth-child(3){
+                 color: #4A4A4A;
+                 margin-top: 6px;
+             }
+         } 
+         .right-pirce{
+             float:right;
+             text-align: right;
+             p:nth-child(1){
+                 color:#E53B33;
+                 font-size: 16px;
+                 font-weight: bold;
+                 margin-top: 15px;
+             }
+             p:nth-child(2){
+                 color: #9096A9;
+                 font-size: 12px;
+             }
+         }
       }
   }
 }
