@@ -1,5 +1,5 @@
 'use strict'
 module.exports = {
   NODE_ENV: '"production"',
-  domain: '"http://192.168.1.212:8025/crm"'
+  domain: '"http://39.107.232.95:6092/web"'
 }
