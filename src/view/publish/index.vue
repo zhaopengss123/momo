@@ -67,10 +67,10 @@
         <van-field
           v-model="form1.unitPrice"
           type="number"
-          name="求购金额"
-          label="求购金额"
-          placeholder="求购金额(单价/份)"
-          :rules="[{ required: true, message: '请填写求购金额(单价/份)' }]"
+          name="道具单价"
+          label="道具单价"
+          placeholder="道具单价"
+          :rules="[{ required: true, message: '请填写道具单价' }]"
         />
         <van-field
           v-model="form1.stock"
@@ -93,7 +93,7 @@
       </van-form>
     </div>
 
-    <div class="form2" v-if="toggleIndex === 1">
+    <div class="form2" v-if="toggleIndex === 2">
       <van-form @submit="onSubmit2">
         <van-field readonly v-model="selectClass.name" name="道具名" label="道具名" placeholder="请选择道具" />
         <van-field
@@ -122,10 +122,10 @@
         <van-field
           v-model="form2.unitPrice"
           type="number"
-          name="求购金额"
-          label="求购金额"
-          placeholder="求购金额(单价/份)"
-          :rules="[{ required: true, message: '请填写求购金额(单价/份)' }]"
+          name="道具单价"
+          label="道具单价"
+          placeholder="道具单价"
+          :rules="[{ required: true, message: '请填写道具单价' }]"
         />
         <van-field
           v-model="form2.stock"
@@ -211,6 +211,11 @@ export default {
       this.form1.deliveryTypeId = val.id;
       this.form1.deliveryTypeName = val.name;
       this.showPicker = false;
+    },
+        onConfirm1(val) {
+      this.form2.deliveryTypeId = val.id;
+      this.form2.deliveryTypeName = val.name;
+      this.showPicker1= false;
     },
     // 求购发布
     onSubmit1() {

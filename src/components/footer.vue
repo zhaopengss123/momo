@@ -5,7 +5,7 @@
                 <div class="center-origin" @click="pushPath('/publish')">发布</div>
                 <div class="footer-bg">
                     <div @click="pushPath('/index')" :class="activeIndex == 1 ? 'active' : ''"><span>首页</span></div>
-                    <div :class="activeIndex == 2 ? 'active' : ''"><span>我的</span></div>
+                    <div @click="pushPath('/user')" :class="activeIndex == 2 ? 'active' : ''"><span>我的</span></div>
                 </div>
             </div>
         </div>
@@ -87,7 +87,7 @@ export default {
         background-size: 16px 17px;
         margin-right: 55px;
         &.active {
-          background: url("../assets/footer1-ed.png") no-repeat center 15px;
+          background: url("../assets/footer-ed.png") no-repeat center 15px;
           background-size: 17px 16px;
           color: #e53b33;
         }
