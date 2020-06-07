@@ -278,8 +278,6 @@ export default {
           this.subLoading = false;
         });
     },
-
-
     backFun() {
       this.$router.back(-1);
     },

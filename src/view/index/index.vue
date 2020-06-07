@@ -2,30 +2,36 @@
   <div class="index">
     <van-nav-bar title="momo道具城" />
     <div class="seach">
-      <input type="text" placeholder="输入关键字" />
+      <input type="text" v-model="propsName" placeholder="输入关键字" />
     </div>
     <div class="banner">
       <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white">
         <van-swipe-item v-for="(image, index) in bannerList" :key="index">
-            <a :href="image.clickUrl"><img v-lazy="image.imgUrl"  /></a>
+          <a :href="image.clickUrl">
+            <img v-lazy="image.imgUrl" />
+          </a>
         </van-swipe-item>
       </van-swipe>
     </div>
     <div class="index-card">
       <div>
         <div class="card-text">
-          <span>求购大厅</span>
-          <span>seek to purchase</span>
+          <router-link to="/buy">
+            <span>求购大厅</span>
+            <span>seek to purchase</span>
+          </router-link>
         </div>
       </div>
       <div>
         <div class="card-text">
+          <router-link to="/sell">
           <span>售卖大厅</span>
           <span>for sell</span>
+          </router-link>
         </div>
       </div>
     </div>
-    <list-component></list-component>
+    <list-component :propsName="propsName" ref="child"></list-component>
     <footer-component></footer-component>
   </div>
 </template>
@@ -37,20 +43,30 @@ export default {
   name: "Index",
   data() {
     return {
-      bannerList: []
+      bannerList: [],
+      propsName: ""
     };
   },
   components: { listComponent, footerComponent },
   methods: {
     getBanner() {
-       this.axios.post('/banner/all').then(res => {
+      this.axios
+        .post("/banner/all")
+        .then(res => {
           this.bannerList = res.data.result || [];
-        }).catch(error => { //捕获失败
         })
+        .catch(error => {
+          //捕获失败
+        });
     }
   },
   mounted() {
     this.getBanner();
+  },
+  watch: {
+    propsName(val) {
+      this.$refs.child.getData(1, val);
+    }
   }
 };
 </script>
@@ -80,7 +96,7 @@ export default {
   background: none;
   font-size: 14px;
 }
-.my-swipe a{
+.my-swipe a {
   display: block;
   overflow: hidden;
 }
@@ -113,11 +129,25 @@ export default {
   margin-left: 15px;
 }
 .card-text {
-  color: #c4534d;
   margin-top: 25px;
   margin-left: 17px;
   font-size: 12px;
 }
+.index-card > div:nth-child(1) {
+  & > div:nth-child(1) {
+    color: #c4534d;
+    a {
+      color: #c4534d;
+    }
+  }
+    & > div:nth-child(2) {
+    color: #3470E2;
+    a {
+      color: #3470E2;
+    }
+  }
+}
+
 .card-text span {
   display: block;
 }

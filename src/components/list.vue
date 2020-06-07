@@ -4,21 +4,23 @@
       <van-dropdown-menu>
         <van-dropdown-item v-model="sort" @change="reset" :options="option1" />
         <van-dropdown-item title="筛选" ref="item">
-                <van-dropdown-menu>
-                    <van-dropdown-item v-model="starlight" :options="starlightList" />
-                    <van-dropdown-item title="筛选" ref="item">
-                    <van-button block type="info" @click="reset">确认</van-button>
-                    </van-dropdown-item>
-                </van-dropdown-menu>
-          <van-switch-cell title="包邮" />
-          <van-switch-cell  title="团购" />
-          <van-button block type="info" @click="reset">确认</van-button>
+            <van-field type="number" v-model="unitPrice" label="单价" placeholder="请输入单价" />
+          <van-dropdown-menu>
+            <van-dropdown-item v-model="starlight" :options="starlightList" />
+          </van-dropdown-menu>
+          <van-dropdown-menu>
+            <van-dropdown-item v-model="privilege" :options="privilegeList" />
+          </van-dropdown-menu>
+          <van-dropdown-menu>
+            <van-dropdown-item v-model="deliveryId" :options="deliveryList" />
+          </van-dropdown-menu>
+          <van-button block type="info" @click="reset1">确认</van-button>
         </van-dropdown-item>
       </van-dropdown-menu>
     </div>
     <div class="list-main">
       <ul>
-        <li v-for="(item,index) in dataList" :key="index">
+        <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item)">
           <img :src="item.propsImg" />
           <div class="list-text">
             <p>{{ item.name }}</p>
@@ -47,6 +49,10 @@ export default {
     propsName: {
       type: String,
       default: ""
+    },
+    isSell: {
+      type: Number,
+      default: null
     }
   },
   data() {
@@ -54,35 +60,71 @@ export default {
       pageNo: 1,
       pageSize: 20,
       dataList: [],
-      starlightList:[{ text:'默认星光',value: null }],
+      starlightList: [{ text: "不限星光", value: null }],
       pages: 1,
+      unitPrice: null,
       sort: null,
       value2: "a",
       starlight: null,
+      privilege: null,
+      deliveryId: null,
+      privilegeList: [
+        {
+          text: "不限权限",
+          value: null
+        },
+        {
+          text: "特权",
+          value: 1
+        },
+        {
+          text: "非特权",
+          value: 0
+        }
+      ],
       option1: [
         { text: "默认排序", value: null },
         { text: "最新发布", value: 1 },
         { text: "价格从低到高", value: 2 },
         { text: "价格从高到低", value: 3 }
+      ],
+      deliveryList: [
+        {
+          text: "不限制配送方式",
+          value: null
+        }
       ]
     };
   },
   methods: {
-    getData(pageNo = this.pageNo) {
+    toDetail(item){
+      const items = JSON.stringify(item);
+      this.$router.push({ name: 'Publishdetail', params:{ items: items} });
+    },
+    getData(pageNo = this.pageNo, propsName) {
+      let pageNos = pageNo;
       this.axios
         .post("release/search", {
           pageNo: pageNo,
           pageSize: this.pageSize,
-          propsName: this.propsName,
+          propsName: propsName || this.propsName,
           starlight: this.starlight,
-          sort: this.sort
+          sort: this.sort,
+          isSell: this.isSell,
+          privilege: this.privilege,
+          deliveryId: this.deliveryId,
+          unitPrice: this.unitPrice
         })
         .then(res => {
           this.pages = res.data.result.length ? this.pages + 1 : this.pages;
+          if(pageNos!=1){
           if (res.data.result.length) {
             const list = JSON.parse(JSON.stringify(this.dataList));
             this.dataList = [...list, ...res.data.result];
           }
+          }else{
+              this.dataList = res.data.result;
+            }
         })
         .catch(error => {
           //捕获失败
@@ -101,24 +143,38 @@ export default {
         }
       }
     },
-    reset(){
-        this.getData(1);
-        this.pageNo = 1;
+    reset1(){
+        this.$refs.item.toggle();
+        this.reset();
+    }, 
+    reset() {
+      this.getData(1);
+      this.pageNo = 1;
     }
   },
   mounted() {
     window.addEventListener("scroll", this.load);
-   this.axios.post("props/starlight/all").then(res =>{
-       const list = res.data.result;
-       list.map((item,index)=>{
-           const j = {
-               text: item,
-               value: item
-           }
-          this.starlightList.push(j);
-       })
-   });
-  
+    this.axios.post("props/starlight/all").then(res => {
+      const list = res.data.result;
+      list.map((item, index) => {
+        const j = {
+          text: "星光：" + item,
+          value: item
+        };
+        this.starlightList.push(j);
+      });
+    });
+    this.axios.post("delivery/all").then(res => {
+      const list = res.data.result;
+      list.map((item, index) => {
+        const j = {
+          text: "配送方式：" + item.name,
+          value: item.id
+        };
+        this.deliveryList.push(j);
+      });
+    });
+
     this.getData();
   },
   destroyed() {
