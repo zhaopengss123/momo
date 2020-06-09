@@ -6,13 +6,19 @@ import PublishDetailComponent from '@/view/publish/detail'
 import UserComponent from '@/view/user/index'
 import BuyComponent from '@/view/index/buy'
 import SellComponent from '@/view/index/sell'
+import LoginComponent from '@/view/index/login'
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/index'
+      redirect: '/login'
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: LoginComponent,
     },
     {
       path: '/index',
