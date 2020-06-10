@@ -40,6 +40,13 @@
     <div class="form1" v-if="toggleIndex === 1">
       <van-form @submit="onSubmit1">
         <van-field readonly v-model="selectClass.name" name="道具名" label="道具名" placeholder="请选择道具" />
+         <van-field
+          v-model="form1.titleDescribe"
+          name="标题描述"
+          label="标题描述"
+          placeholder="标题描述"
+          :rules="[{ required: true, message: '请填写标题描述' }]"
+        />
         <van-field
           v-model="form1.roomNumber"
           type="number"
@@ -191,7 +198,8 @@ export default {
         anchorName: null,
         unitPrice: null,
         stock: null,
-        describe: null
+        describe: null,
+        titleDescribe: null,
       },
       form2: {
         deliveryTypeId: null,
@@ -202,8 +210,11 @@ export default {
         unitPrice: null,
         titleDescribe: '',
         stock: null,
-        describe: null
-      }
+        describe: null,
+
+      },
+      sceneInfo: `{"h5_info”:{"wap_url”:"https://momo.beituokj.com”,”type”:”Wap”,”wap_name”:”充值支付”}}`
+
     };
   },
   methods: {
@@ -228,7 +239,10 @@ export default {
             deliveryTypeId: this.form1.deliveryTypeId,
             unitPrice: this.form1.unitPrice,
             stock: this.form1.stock,
-            describe: this.form1.describe
+            describe: this.form1.describe,
+            openId: this.$store.state.openId,
+            titleDescribe: this.form1.titleDescribe,
+            sceneInfo: this.sceneInfo
         })
         .then(res => {
                 this.subLoading = false;
@@ -259,7 +273,8 @@ export default {
             deliveryTypeId: this.form1.deliveryTypeId,
             unitPrice: this.form1.unitPrice,
             stock: this.form1.stock,
-            describe: this.form1.describe
+            describe: this.form1.describe,
+            openId: this.$store.state.openId
         })
         .then(res => {
                 this.subLoading = false;
