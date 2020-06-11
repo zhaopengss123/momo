@@ -72,6 +72,25 @@
           @click="showPicker = true"
         />
         <van-field
+          readonly
+          clickable
+          name="picker"
+          :value="form1.distributionTimeName"
+          label="配送时间"
+          placeholder="点击选择配送时间"
+          @click="showPickertime1 = true"
+        />
+        
+        <van-field
+          readonly
+          clickable
+          name="picker"
+          :value="form1.guestsName"
+          label="嘉宾"
+          placeholder="点击选择嘉宾"
+          @click="showguestsPicker = true"
+        />
+        <van-field
           v-model="form1.unitPrice"
           type="number"
           name="道具单价"
@@ -127,6 +146,17 @@
           @click="showPicker1 = true"
         />
         <van-field
+          readonly
+          clickable
+          name="picker"
+          :value="form2.guestsName"
+          label="嘉宾"
+          placeholder="点击选择嘉宾"
+          @click="showguestsPicker1 = true"
+        />
+
+        
+        <van-field
           v-model="form2.unitPrice"
           type="number"
           name="道具单价"
@@ -165,6 +195,24 @@
       />
     </van-popup>
 
+
+    <van-popup v-model="showguestsPicker" position="bottom">
+      <van-picker
+        show-toolbar
+        :columns="guestsList"
+        @confirm="onConfirmGuests"
+        @cancel="showguestsPicker = false"
+      />
+    </van-popup>
+        <van-popup v-model="showguestsPicker1" position="bottom">
+      <van-picker
+        show-toolbar
+        :columns="guestsList"
+        @confirm="onConfirmGuests1"
+        @cancel="showguestsPicker1 = false"
+      />
+    </van-popup>
+
         <van-popup v-model="showPicker1" position="bottom">
       <van-picker
         show-toolbar
@@ -173,14 +221,27 @@
         @cancel="showPicker1 = false"
       />
     </van-popup>
+ <van-popup v-model="showPickertime1" position="bottom">
+        <van-datetime-picker
+          @confirm="changeDateTime()"
+          @cancel="showPickertime1 = false"
+          v-model="distributionTime"
+          type="datetime"
+          title="选择配送时间"
+        />
+ </van-popup>      
+
+
   </div>
 </template>
 
 <script>
+import { TransfromDateTimes } from '@/assets/utils';
 export default {
   name: "Index",
   data() {
     return {
+      distributionTime: new Date(),
       subLoading: false,
       toggleIndex: 1,
       commodityList: [],
@@ -188,8 +249,12 @@ export default {
       selectClass: {},
       showPicker: false,
       showPicker1: false,
+      showguestsPicker: false,
+      showguestsPicker1: false,
       deliveryList: [],
+      guestsList: [],
       totalMoney: 0,
+      showPickertime1: false,
       form1: {
         deliveryTypeId: null,
         deliveryTypeName: null,
@@ -200,6 +265,9 @@ export default {
         stock: null,
         describe: null,
         titleDescribe: null,
+        guestsId: 1,
+        guestsName: '主持人/主播',
+        distributionTime:  TransfromDateTimes()
       },
       form2: {
         deliveryTypeId: null,
@@ -208,53 +276,71 @@ export default {
         roomNumber: null,
         anchorName: null,
         unitPrice: null,
-        titleDescribe: '',
+        titleDescribe: "",
         stock: null,
         describe: null,
-
+        guestsId: 1,
+        guestsName: '主持人/主播',
+        distributionTime: TransfromDateTimes()
       },
       sceneInfo: `{"h5_info”:{"wap_url”:"https://momo.beituokj.com”,”type”:”Wap”,”wap_name”:”充值支付”}}`
-
     };
   },
   methods: {
+
     onConfirm(val) {
       this.form1.deliveryTypeId = val.id;
       this.form1.deliveryTypeName = val.name;
       this.showPicker = false;
     },
-        onConfirm1(val) {
+    onConfirm1(val) {
       this.form2.deliveryTypeId = val.id;
       this.form2.deliveryTypeName = val.name;
-      this.showPicker1= false;
+      this.showPicker1 = false;
+    },
+    onConfirmGuests(val){
+      this.form1.guestsId = val.id;
+      this.form1.guestsName = val.text;
+      this.showguestsPicker = false;
+    },
+    onConfirmGuests1(val){
+      this.form2.guestsId = val.id;
+      this.form2.guestsName = val.text;
+      this.showguestsPicker1 = false;
+    },
+    changeDateTime(){
+      this.form1.distributionTime = this.distributionTime;
+      this.form1.distributionTimeName = TransfromDateTimes(this.distributionTime);
+      this.showPickertime1 = false;
     },
     // 求购发布
     onSubmit1() {
       this.subLoading = true;
       this.axios
-        .post(`/release/buy`,{
-            propsConfigId: this.selectClass.id,
-            roomNumber: this.form1.roomNumber,
-            anchorName: this.form1.anchorName,
-            deliveryTypeId: this.form1.deliveryTypeId,
-            unitPrice: this.form1.unitPrice,
-            stock: this.form1.stock,
-            describe: this.form1.describe,
-            openId: this.$store.state.openId,
-            titleDescribe: this.form1.titleDescribe,
-            sceneInfo: this.sceneInfo
+        .post(`/release/buy`, {
+          propsConfigId: this.selectClass.id,
+          roomNumber: this.form1.roomNumber,
+          anchorName: this.form1.anchorName,
+          deliveryTypeId: this.form1.deliveryTypeId,
+          unitPrice: this.form1.unitPrice,
+          guestsId: this.form1.guestsId,
+          stock: this.form1.stock,
+          describe: this.form1.describe,
+          openId: this.$store.state.openId,
+          titleDescribe: this.form1.titleDescribe,
+          sceneInfo: this.sceneInfo,
+          distributionTime: this.form1.distributionTime
         })
         .then(res => {
-                this.subLoading = false;
+          this.subLoading = false;
           if (res.data.returnCode == "SUCCESS") {
-            Dialog({ message: '操作成功' });
-            setTimeout(res=>{
-              this.$router.push({ path: '/' })
+            Dialog({ message: "操作成功" });
+            setTimeout(res => {
+              this.$router.push({ path: "/" });
               done();
-            },1000)
-            
-          }else{
-            Dialog({ message:res.data.returnMsg });
+            }, 1000);
+          } else {
+            Dialog({ message: res.data.returnMsg });
           }
         })
         .catch(error => {
@@ -266,27 +352,27 @@ export default {
     onSubmit2() {
       this.subLoading = true;
       this.axios
-        .post(`/release/sell`,{
-            propsConfigId: this.selectClass.id,
-            roomNumber: this.form1.roomNumber,
-            anchorName: this.form1.anchorName,
-            deliveryTypeId: this.form1.deliveryTypeId,
-            unitPrice: this.form1.unitPrice,
-            stock: this.form1.stock,
-            describe: this.form1.describe,
-            openId: this.$store.state.openId
+        .post(`/release/sell`, {
+          propsConfigId: this.selectClass.id,
+          roomNumber: this.form2.roomNumber,
+          anchorName: this.form2.anchorName,
+          deliveryTypeId: this.form2.deliveryTypeId,
+          guestsId: this.form2.guestsId,
+          unitPrice: this.form2.unitPrice,
+          stock: this.form2.stock,
+          describe: this.form2.describe,
+          openId: this.$store.state.openId
         })
         .then(res => {
-                this.subLoading = false;
+          this.subLoading = false;
           if (res.data.returnCode == "SUCCESS") {
-            Dialog({ message: '操作成功' });
-            setTimeout(res=>{
-              this.$router.push({ path: '/' })
+            Dialog({ message: "操作成功" });
+            setTimeout(res => {
+              this.$router.push({ path: "/" });
               done();
-            },1000)
-            
-          }else{
-            Dialog({ message:res.data.returnMsg });
+            }, 1000);
+          } else {
+            Dialog({ message: res.data.returnMsg });
           }
         })
         .catch(error => {
@@ -313,27 +399,33 @@ export default {
       this.selectClass = item;
     },
     getDelivery() {
-      this.axios
-        .post(`/delivery/all`)
-        .then(res => {
-          if (res.data.returnCode == "SUCCESS") {
-            let deliveryList = [];
-            res.data.result.map(item => {
-              item.value = item.id;
-              item.text = item.name;
-              deliveryList.push(item);
-            });
-            this.deliveryList = deliveryList;
-          }
-        })
-        .catch(error => {
-          //捕获失败
-        });
+      this.axios.post(`/delivery/all`).then(res => {
+        if (res.data.returnCode == "SUCCESS") {
+          let deliveryList = [];
+          res.data.result.map(item => {
+            item.value = item.id;
+            item.text = item.name;
+            deliveryList.push(item);
+          });
+          this.deliveryList = deliveryList;
+        }
+      });
     }
   },
   mounted() {
     this.getDList(1);
     this.getDelivery();
+    this.axios.post(`/guestsInfo/all`).then(res => {
+      if (res.data.returnCode == "SUCCESS") {
+        let guestsList = [];
+        res.data.result.map(item => {
+          item.value = item.id;
+          item.text = item.guestsName;
+          guestsList.push(item);
+        });
+        this.guestsList = guestsList;
+      }
+    });
   }
 };
 </script>
