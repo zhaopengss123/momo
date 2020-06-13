@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import { NavBar , Swipe, SwipeItem , Lazyload, DropdownMenu, DropdownItem, SwitchCell, Button, DatetimePicker, Field, Form, Popup,Picker,Dialog     } from 'vant';
+import { NavBar , Swipe, SwipeItem , Lazyload, DropdownMenu, DropdownItem, SwitchCell, Button, DatetimePicker, Field, Form, Popup,Picker,Dialog,Uploader     } from 'vant';
 import 'lib-flexible/flexible'
 import Axios from './axios-conf';
 import stores from './store-conf';
@@ -24,6 +24,7 @@ Vue.use(Form);
 Vue.use(Popup);
 Vue.use(Picker);
 Vue.use(Dialog);
+Vue.use(Uploader);
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

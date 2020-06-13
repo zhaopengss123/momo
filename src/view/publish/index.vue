@@ -40,7 +40,7 @@
     <div class="form1" v-if="toggleIndex === 1">
       <van-form @submit="onSubmit1">
         <van-field readonly v-model="selectClass.name" name="道具名" label="道具名" placeholder="请选择道具" />
-         <van-field
+        <van-field
           v-model="form1.titleDescribe"
           name="标题描述"
           label="标题描述"
@@ -75,12 +75,12 @@
           readonly
           clickable
           name="picker"
-          :value="form1.distributionTimeName"
+          :value="form1.distributionTime"
           label="配送时间"
           placeholder="点击选择配送时间"
           @click="showPickertime1 = true"
         />
-        
+
         <van-field
           readonly
           clickable
@@ -107,6 +107,15 @@
           :rules="[{ required: true, message: '请填写数量' }]"
         />
         <van-field
+          name="form1.imgUrl"
+          label="道具图片"
+          :rules="[{ required: true, message: '请填写道具图片' }]"
+        >
+          <template #input>
+            <van-uploader v-model="customerImg" :max-count="1" :after-read="afterRead" />
+          </template>
+        </van-field>
+        <van-field
           v-model="form1.describe"
           name="道具描述"
           label="道具描述"
@@ -114,7 +123,14 @@
           :rules="[{ required: true, message: '请填写道具描述' }]"
         />
         <div style="margin: 16px;">
-          <van-button class="sbtn" round block type="info" :loading="subLoading" native-type="submit">发布</van-button>
+          <van-button
+            class="sbtn"
+            round
+            block
+            type="info"
+            :loading="subLoading"
+            native-type="submit"
+          >发布</van-button>
         </div>
       </van-form>
     </div>
@@ -155,7 +171,6 @@
           @click="showguestsPicker1 = true"
         />
 
-        
         <van-field
           v-model="form2.unitPrice"
           type="number"
@@ -180,11 +195,17 @@
           :rules="[{ required: true, message: '请填写道具描述' }]"
         />
         <div style="margin: 16px;">
-          <van-button class="sbtn" round block type="info" :loading="subLoading" native-type="submit">发布</van-button>
+          <van-button
+            class="sbtn"
+            round
+            block
+            type="info"
+            :loading="subLoading"
+            native-type="submit"
+          >发布</van-button>
         </div>
       </van-form>
     </div>
-
 
     <van-popup v-model="showPicker" position="bottom">
       <van-picker
@@ -195,7 +216,6 @@
       />
     </van-popup>
 
-
     <van-popup v-model="showguestsPicker" position="bottom">
       <van-picker
         show-toolbar
@@ -204,7 +224,7 @@
         @cancel="showguestsPicker = false"
       />
     </van-popup>
-        <van-popup v-model="showguestsPicker1" position="bottom">
+    <van-popup v-model="showguestsPicker1" position="bottom">
       <van-picker
         show-toolbar
         :columns="guestsList"
@@ -213,7 +233,7 @@
       />
     </van-popup>
 
-        <van-popup v-model="showPicker1" position="bottom">
+    <van-popup v-model="showPicker1" position="bottom">
       <van-picker
         show-toolbar
         :columns="deliveryList"
@@ -221,22 +241,20 @@
         @cancel="showPicker1 = false"
       />
     </van-popup>
- <van-popup v-model="showPickertime1" position="bottom">
-        <van-datetime-picker
-          @confirm="changeDateTime()"
-          @cancel="showPickertime1 = false"
-          v-model="distributionTime"
-          type="datetime"
-          title="选择配送时间"
-        />
- </van-popup>      
-
-
+    <van-popup v-model="showPickertime1" position="bottom">
+      <van-datetime-picker
+        @confirm="changeDateTime()"
+        @cancel="showPickertime1 = false"
+        v-model="distributionTime"
+        type="datetime"
+        title="选择配送时间"
+      />
+    </van-popup>
   </div>
 </template>
 
 <script>
-import { TransfromDateTimes } from '@/assets/utils';
+import { TransfromDateTimes, getopenId } from "@/assets/utils";
 export default {
   name: "Index",
   data() {
@@ -266,8 +284,8 @@ export default {
         describe: null,
         titleDescribe: null,
         guestsId: 1,
-        guestsName: '主持人/主播',
-        distributionTime:  TransfromDateTimes()
+        guestsName: "主持人/主播",
+        distributionTime: TransfromDateTimes()
       },
       form2: {
         deliveryTypeId: null,
@@ -280,14 +298,23 @@ export default {
         stock: null,
         describe: null,
         guestsId: 1,
-        guestsName: '主持人/主播',
-        distributionTime: TransfromDateTimes()
+        guestsName: "主持人/主播",
+        distributionTime: TransfromDateTimes(),
+        openId: getopenId()
       },
       sceneInfo: `{"h5_info”:{"wap_url”:"https://momo.beituokj.com”,”type”:”Wap”,”wap_name”:”充值支付”}}`
     };
   },
   methods: {
-
+    afterRead(file) {
+      this.axios
+        .post(`/release/uploadImg`, {
+          file: file.file,
+          openId: getopenId(),
+          releasePropsId: this.selectClass.id
+        })
+        .then(res => {});
+    },
     onConfirm(val) {
       this.form1.deliveryTypeId = val.id;
       this.form1.deliveryTypeName = val.name;
@@ -298,19 +325,18 @@ export default {
       this.form2.deliveryTypeName = val.name;
       this.showPicker1 = false;
     },
-    onConfirmGuests(val){
+    onConfirmGuests(val) {
       this.form1.guestsId = val.id;
       this.form1.guestsName = val.text;
       this.showguestsPicker = false;
     },
-    onConfirmGuests1(val){
+    onConfirmGuests1(val) {
       this.form2.guestsId = val.id;
       this.form2.guestsName = val.text;
       this.showguestsPicker1 = false;
     },
-    changeDateTime(){
-      this.form1.distributionTime = this.distributionTime;
-      this.form1.distributionTimeName = TransfromDateTimes(this.distributionTime);
+    changeDateTime() {
+      this.form1.distributionTime = TransfromDateTimes(this.distributionTime);
       this.showPickertime1 = false;
     },
     // 求购发布
@@ -326,7 +352,7 @@ export default {
           guestsId: this.form1.guestsId,
           stock: this.form1.stock,
           describe: this.form1.describe,
-          openId: this.$store.state.openId,
+          openId: this.openId,
           titleDescribe: this.form1.titleDescribe,
           sceneInfo: this.sceneInfo,
           distributionTime: this.form1.distributionTime
@@ -342,9 +368,6 @@ export default {
           } else {
             Dialog({ message: res.data.returnMsg });
           }
-        })
-        .catch(error => {
-          this.subLoading = false;
         });
     },
 

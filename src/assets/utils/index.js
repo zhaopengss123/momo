@@ -1,3 +1,4 @@
+import store from '../../store-conf';
  export const TransfromDateTimes =(( data = new Date() )=>{
     var now = data;
     var yy = now.getFullYear(); //年
@@ -18,4 +19,8 @@
     if (ss < 10) time += '0';
     time += ss;
     return time;
-})
+});
+export const getopenId= ()=>{
+    const openId = store().state.openId;
+    return openId;
+}
