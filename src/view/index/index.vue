@@ -65,7 +65,7 @@ export default {
   },
   watch: {
     propsName(val) {
-      this.$refs.child.getData(1, val);
+      this.$refs.child.getData(1, val, true);
     }
   }
 };

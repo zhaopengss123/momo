@@ -7,6 +7,7 @@ import UserComponent from '@/view/user/index'
 import BuyComponent from '@/view/index/buy'
 import SellComponent from '@/view/index/sell'
 import LoginComponent from '@/view/index/login'
+import BindphoneComponent from '@/view/user/bindphone'
 Vue.use(Router)
 
 export default new Router({
@@ -50,5 +51,10 @@ export default new Router({
       name: 'User',
       component: UserComponent
     },
+    {
+      path: '/bindphone',
+      name: 'Bindphone',
+      component: BindphoneComponent
+    }
   ]
 })

@@ -20,7 +20,7 @@
           <li>
             <div>选择道具</div>
             <div>
-              <input class="top-input" type="text" placeholder="输入关键字搜索" />
+              <input class="top-input" type="text" v-model="seachText" placeholder="输入关键字搜索" />
               <img hidden src="../../assets/seach.png" alt />
             </div>
           </li>
@@ -106,7 +106,7 @@
           placeholder="数量"
           :rules="[{ required: true, message: '请填写数量' }]"
         />
-        <van-field
+        <!-- <van-field
           name="form1.imgUrl"
           label="道具图片"
           :rules="[{ required: true, message: '请填写道具图片' }]"
@@ -114,7 +114,7 @@
           <template #input>
             <van-uploader v-model="customerImg" :max-count="1" :after-read="afterRead" />
           </template>
-        </van-field>
+        </van-field>-->
         <van-field
           v-model="form1.describe"
           name="道具描述"
@@ -146,13 +146,6 @@
           :rules="[{ required: true, message: '请填写标题描述' }]"
         />
         <van-field
-          v-model="form2.anchorName"
-          name="主播姓名"
-          label="主播姓名"
-          placeholder="主播姓名"
-          :rules="[{ required: true, message: '请填写主播姓名' }]"
-        />
-        <van-field
           readonly
           clickable
           name="picker"
@@ -161,16 +154,6 @@
           placeholder="点击选择配送方式"
           @click="showPicker1 = true"
         />
-        <van-field
-          readonly
-          clickable
-          name="picker"
-          :value="form2.guestsName"
-          label="嘉宾"
-          placeholder="点击选择嘉宾"
-          @click="showguestsPicker1 = true"
-        />
-
         <van-field
           v-model="form2.unitPrice"
           type="number"
@@ -205,6 +188,12 @@
           >发布</van-button>
         </div>
       </van-form>
+    </div>
+    <div class="footer">
+      <div v-if="selectClass.serviceCharge ||  selectClass.cashDeposit">
+      *<span v-if="selectClass.serviceCharge">含{{ selectClass.serviceCharge }}服务费 </span>
+      <span v-if="selectClass.cashDeposit">{{ selectClass.cashDeposit }}保证金</span>
+      </div>
     </div>
 
     <van-popup v-model="showPicker" position="bottom">
@@ -259,6 +248,7 @@ export default {
   name: "Index",
   data() {
     return {
+      seachText: '',
       distributionTime: new Date(),
       subLoading: false,
       toggleIndex: 1,
@@ -292,13 +282,10 @@ export default {
         deliveryTypeName: null,
         describe: "",
         roomNumber: null,
-        anchorName: null,
         unitPrice: null,
         titleDescribe: "",
         stock: null,
         describe: null,
-        guestsId: 1,
-        guestsName: "主持人/主播",
         distributionTime: TransfromDateTimes(),
         openId: getopenId()
       },
@@ -307,13 +294,15 @@ export default {
   },
   methods: {
     afterRead(file) {
-      this.axios
-        .post(`/release/uploadImg`, {
-          file: file.file,
-          openId: getopenId(),
-          releasePropsId: this.selectClass.id
-        })
-        .then(res => {});
+      let formData = new FormData();
+      formData.append("openId", getopenId());
+      formData.append("releasePropsId", this.selectClass.id);
+      let config = {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      };
+      this.axios.post(`/release/uploadImg`, formData, config).then(res => {});
     },
     onConfirm(val) {
       this.form1.deliveryTypeId = val.id;
@@ -352,50 +341,73 @@ export default {
           guestsId: this.form1.guestsId,
           stock: this.form1.stock,
           describe: this.form1.describe,
-          openId: this.openId,
+          openId: getopenId(),
           titleDescribe: this.form1.titleDescribe,
           sceneInfo: this.sceneInfo,
           distributionTime: this.form1.distributionTime
         })
         .then(res => {
           this.subLoading = false;
+          const that = this;
           if (res.data.returnCode == "SUCCESS") {
-            Dialog({ message: "操作成功" });
-            setTimeout(res => {
-              this.$router.push({ path: "/" });
-              done();
-            }, 1000);
+            WeixinJSBridge.invoke(
+              "getBrandWCPayRequest",
+              {
+                appId:  res.data.result.appId, //公众号名称，由商户传入
+                timeStamp: res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                nonceStr: res.data.result.nonceStr, //随机串
+                package: res.data.result.packages,
+                signType:  res.data.result.signType, //微信签名方式：
+                paySign: res.data.result.paySign //微信签名
+              },
+              function(res) {
+                if (res.err_msg == "get_brand_wcpay_request:ok") {
+                    that.$router.push({ path: '/index' });
+                }
+              }
+            );
           } else {
-            Dialog({ message: res.data.returnMsg });
+            this.$dialog({ message: res.data.returnMsg });
           }
         });
     },
 
     // 售卖发布
     onSubmit2() {
+      const that = this;
       this.subLoading = true;
       this.axios
         .post(`/release/sell`, {
           propsConfigId: this.selectClass.id,
           roomNumber: this.form2.roomNumber,
-          anchorName: this.form2.anchorName,
           deliveryTypeId: this.form2.deliveryTypeId,
-          guestsId: this.form2.guestsId,
           unitPrice: this.form2.unitPrice,
           stock: this.form2.stock,
           describe: this.form2.describe,
-          openId: this.$store.state.openId
+          openId: getopenId(),
+          titleDescribe: this.form2.titleDescribe
         })
         .then(res => {
           this.subLoading = false;
           if (res.data.returnCode == "SUCCESS") {
-            Dialog({ message: "操作成功" });
-            setTimeout(res => {
-              this.$router.push({ path: "/" });
-              done();
-            }, 1000);
+            WeixinJSBridge.invoke(
+              "getBrandWCPayRequest",
+              {
+                appId:  res.data.result.appId, //公众号名称，由商户传入
+                timeStamp: res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                nonceStr: res.data.result.nonceStr, //随机串
+                package: res.data.result.packages,
+                signType:  res.data.result.signType, //微信签名方式：
+                paySign: res.data.result.paySign //微信签名
+              },
+              function(res) {
+                if(res.err_msg == "get_brand_wcpay_request:ok" ){
+                    that.$router.push({ path: '/index' });
+                }
+              }
+            );
           } else {
-            Dialog({ message: res.data.returnMsg });
+            this.$dialog({ message: res.data.returnMsg });
           }
         })
         .catch(error => {
@@ -412,6 +424,7 @@ export default {
           if (res.data.returnCode == "SUCCESS") {
             this.commodityList = res.data.result || [];
             this.parescommodityList = res.data.result;
+            this.seachText = '';
           }
         })
         .catch(error => {
@@ -449,6 +462,13 @@ export default {
         this.guestsList = guestsList;
       }
     });
+  },
+    watch: {
+      seachText(val) {
+        let commodityList = JSON.parse(JSON.stringify(this.parescommodityList));
+        let arr = commodityList.filter(item=>item.name.indexOf(val)!=-1);
+        this.commodityList = arr;
+      }
   }
 };
 </script>
@@ -456,6 +476,13 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .index {
+
+  .footer{
+    text-align: center;
+    color: #9096A9;
+    font-size: 14px;
+    margin-bottom: 55px;
+  }
   .sbtn {
     background: linear-gradient(
       203deg,
@@ -548,7 +575,6 @@ export default {
     }
     .commodity-list {
       width: 100%;
-      overflow: hidden;
       div {
         width: 54px;
         height: 54px;

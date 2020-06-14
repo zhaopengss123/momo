@@ -4,7 +4,7 @@
       <van-dropdown-menu>
         <van-dropdown-item v-model="sort" @change="reset" :options="option1" />
         <van-dropdown-item title="筛选" ref="item">
-            <van-field type="number" v-model="unitPrice" label="单价" placeholder="请输入单价" />
+          <van-field type="number" v-model="unitPrice" label="单价" placeholder="请输入单价" />
           <van-dropdown-menu>
             <van-dropdown-item v-model="starlight" :options="starlightList" />
           </van-dropdown-menu>
@@ -20,10 +20,14 @@
     </div>
     <div class="list-main">
       <ul>
-        <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item)">
+        <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item.id,item.releaseType)">
           <img :src="item.propsImg" />
           <div class="list-text">
-            <p>{{ item.name }}</p>
+            <p>
+              {{ item.name }}
+              <span v-if="item.releaseType == 1">售卖</span>
+              <i v-if="item.releaseType == 0">求购</i>
+            </p>
             <!-- <p>最酷炫的道具之一</p> -->
             <p v-if="item.createTime">{{ item.createTime }} · 平台上传</p>
           </div>
@@ -48,7 +52,7 @@ export default {
   props: {
     propsName: {
       type: String,
-      default: ""
+      default: null
     },
     isSell: {
       type: Number,
@@ -97,17 +101,16 @@ export default {
     };
   },
   methods: {
-    toDetail(item){
-      const items = JSON.stringify(item);
-      this.$router.push({ name: 'Publishdetail', params:{ items: items} });
+    toDetail(id, releaseType) {
+      this.$router.push({ name: "Publishdetail", params: { id: id,releaseType:releaseType } });
     },
-    getData(pageNo = this.pageNo, propsName) {
+    getData(pageNo = this.pageNo, propsName, isseach = false) {
       let pageNos = pageNo;
       this.axios
         .post("release/search", {
           pageNo: pageNo,
           pageSize: this.pageSize,
-          propsName: propsName || this.propsName,
+          propsName: !propsName&&!isseach ? this.propsName : propsName,
           starlight: this.starlight,
           sort: this.sort,
           isSell: this.isSell,
@@ -117,14 +120,14 @@ export default {
         })
         .then(res => {
           this.pages = res.data.result.length ? this.pages + 1 : this.pages;
-          if(pageNos!=1){
-          if (res.data.result.length) {
-            const list = JSON.parse(JSON.stringify(this.dataList));
-            this.dataList = [...list, ...res.data.result];
-          }
-          }else{
-              this.dataList = res.data.result;
+          if (pageNos != 1) {
+            if (res.data.result.length) {
+              const list = JSON.parse(JSON.stringify(this.dataList));
+              this.dataList = [...list, ...res.data.result];
             }
+          } else {
+            this.dataList = res.data.result;
+          }
         })
         .catch(error => {
           //捕获失败
@@ -143,10 +146,10 @@ export default {
         }
       }
     },
-    reset1(){
-        this.$refs.item.toggle();
-        this.reset();
-    }, 
+    reset1() {
+      this.$refs.item.toggle();
+      this.reset();
+    },
     reset() {
       this.getData(1);
       this.pageNo = 1;
@@ -234,6 +237,31 @@ export default {
           color: #101010;
           font-size: 16px;
           font-weight: bold;
+          span {
+            display: inline-block;
+            width: 28px;
+            height: 16px;
+            line-height: 16px;
+            text-align: center;
+            font-weight: normal;
+            background: #fff0f0;
+            color: #e53b33;
+            font-size: 10px;
+            margin-left: 10px;
+          }
+          i {
+            display: inline-block;
+            width: 28px;
+            height: 16px;
+            line-height: 16px;
+            text-align: center;
+            font-weight: normal;
+            background:rgba(255,142,57,0.1);
+            color: #FF8E39;
+            font-style: normal;
+            font-size: 10px;
+            margin-left: 10px;
+          }
         }
         p:nth-child(3) {
           color: #4a4a4a;

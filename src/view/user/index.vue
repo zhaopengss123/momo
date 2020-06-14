@@ -1,6 +1,14 @@
 <template>
   <div class="index">
     <van-nav-bar title="momo道具城" />
+    <div class="header">
+      <img :src="userInfo.userHeadImgUrl" alt />
+      <div>
+        <span>{{ userInfo.nickName }}</span>
+        <span v-if="userInfo.phone">{{ userInfo.phone }}</span>
+        <span v-else><router-link to="/bindphone">未绑定 ></router-link></span>
+      </div>
+    </div>
     <div>
       <div class="card">
         <div class="card-title">我的发布</div>
@@ -67,10 +75,10 @@
           </ul>
         </div>
       </div>
-     <div class="card">
+      <div class="card">
         <div class="card-title">联系客服</div>
       </div>
-     <div class="card">
+      <div class="card">
         <div class="card-title">订单申诉</div>
       </div>
     </div>
@@ -80,20 +88,67 @@
 
 <script>
 import footerComponent from "@/components/footer";
+import { getopenId } from "@/assets/utils";
+
 export default {
   name: "Index",
   data() {
-    return {};
+    return {
+      userInfo: {}
+    };
   },
   components: { footerComponent },
   methods: {},
-  mounted() {}
+  mounted() {
+    if (this.$store.state.userInfo.userOpenId) {
+      this.userInfo = this.$store.state.userInfo;
+    } else {
+      this.axios.post(`/user/info/${getopenId()}`).then(res => {
+        if (res.data.returnCode == "SUCCESS") {
+          this.$store.commit("setUserInfo", res.data.result);
+          this.userInfo = res.data.result;
+        }
+      });
+    }
+  }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .index {
+  .header {
+    float: left;
+    margin-left: 25px;
+    margin-top: 13px;
+    margin-bottom: 30px;
+    a{
+      color: inherit;
+    }
+    img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      float: left;
+    }
+    div {
+      float: left;
+      margin-left: 10px;
+      span {
+        display: block;
+        &:nth-child(1) {
+          color: #373c41;
+          font-size: 16px;
+          margin-top: 5px;
+        }
+        &:nth-child(2) {
+          color: #919BA5;
+          font-size: 12px;
+          margin-top: 6px;
+        }
+      }
+    }
+  }
   .card {
     overflow: hidden;
     width: 100%;
@@ -155,7 +210,7 @@ export default {
         background-image: url("../../assets/user/8.png");
       }
     }
-        &:nth-child(3) {
+    &:nth-child(3) {
       li:nth-child(1) {
         background-image: url("../../assets/user/1.png");
       }

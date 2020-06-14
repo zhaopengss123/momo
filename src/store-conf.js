@@ -10,16 +10,18 @@ export default () => {
   return new Vuex.Store({
     state:{
       openId: 'osHzdt5mqVBHOA5gN_hO8TY1GZP8',
-      phone: false
+      phone: false,
+      userInfo:{}
     },
     getters:{
-      openId: state=>{
-        return state.openId
-      }
+
     },
     mutations:{
       editOpenId(state,text){
         state.openId = text
+      },
+      setUserInfo(state,str){
+        state.userInfo = str;
       }
     }
   });
