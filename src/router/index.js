@@ -8,6 +8,9 @@ import BuyComponent from '@/view/index/buy'
 import SellComponent from '@/view/index/sell'
 import LoginComponent from '@/view/index/login'
 import BindphoneComponent from '@/view/user/bindphone'
+import ReleaseInfoComponent from '@/view/user/releaseInfo'
+import ReleaseDetailComponent from '@/view/user/list-detail/detail'
+
 Vue.use(Router)
 
 export default new Router({
@@ -55,6 +58,17 @@ export default new Router({
       path: '/bindphone',
       name: 'Bindphone',
       component: BindphoneComponent
-    }
+    },
+    {
+      path: '/releaseInfo',
+      name: 'ReleaseInfo',
+      component: ReleaseInfoComponent
+    },
+    {
+      path: '/releasedetail',
+      name: 'ReleaseDetail',
+      component: ReleaseDetailComponent
+    },
+    
   ]
 })

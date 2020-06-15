@@ -1,0 +1,228 @@
+<template>
+  <div class="detail">
+    <van-nav-bar title="道具详情" left-arrow @click-left="backFun" />
+    <div>
+      <div class="header">
+        <img :src="item.propsImgUrl" />
+        <div class="list-text">
+          <p>{{ item.propsName }}</p>
+          <p>{{ item.titleDescribe }}</p>
+          <p v-if="item.createTime">{{ item.createTime }} · 平台上传</p>
+        </div>
+        <div class="right-pirce">
+          <p>¥{{ item.payPrice }}</p>
+          <p>库存{{ item.originalStock }}</p>
+        </div>
+      </div>
+      <div class="list">
+        <ul>
+          <!-- <li>
+            <span>截止时间</span>
+            <span></span>
+          </li>-->
+          <li>
+            <span>单价</span>
+            <span>{{ item.unitPrice }}/份</span>
+          </li>
+          <li>
+            <span>现有库存</span>
+            <span>{{ item.dynamicStock }}</span>
+          </li>
+          <li v-if="item.isSell == 0">
+            <span>房间号</span>
+            <span>{{ item.roomNumber }}</span>
+          </li>
+          <li v-if="item.isSell == 0">
+            <span>主播名</span>
+            <span>{{ item.guestsName }}</span>
+          </li>
+          <li v-if="item.isSell == 0">
+            <span>嘉宾</span>
+            <span>{{ item.anchorName }}</span>
+          </li>
+          <li>
+            <span>配送方式</span>
+            <span>{{ item.deliveryTypeName }}</span>
+          </li>
+          <li>
+            <span>订单号</span>
+            <span>{{ item.orderNo }}</span>
+          </li>
+          <li>
+            <span>支付金额</span>
+            <span>{{ item.payPrice }}</span>
+          </li>
+          <li>
+            <span>发布时间</span>
+            <span>{{ item.createTime }}</span>
+          </li>          
+          <li>
+            <span>支付时间</span>
+            <span>{{ item.payTime }}</span>
+          </li>
+          <li>
+            <span>下架时间</span>
+            <span>{{ item.downShelfTime }}</span>
+          </li>
+          <li>
+            <span>道具类别</span>
+            <span>{{ item.releaseType == 1 ? '售卖' : '求购' }}</span>
+          </li>
+          <li>
+            <span>道具状态</span>
+            <span>{{ item.releaseStatus == 1 ? '已上架' : item.releaseStatus == 0 ? '已下架' : item.releaseStatus == 2 ? '待付款' : item.releaseStatus == 3 ? '交易关闭' : item.releaseStatus == 4 ? '待审核' : item.releaseStatus == 5 ? '审核通过' : item.releaseStatus == 6 ? '审核失败' : '--' }}</span>
+          </li>
+          <li v-if="item.releaseStatus !=1 && item.releaseStatus !=0">
+            <span>原因</span>
+            <span>{{ item.closeName }}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="list-img" v-if="imgList.length">
+        <img v-for="(item,index) in imgList" :key="index" :src="item">
+      </div>
+      <div class="submit-btn">购买</div>
+      <div class="submit-btn close-btn">下架道具</div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { TransfromDateTimes, getopenId } from "@/assets/utils";
+export default {
+  name: "Detail",
+  data() {
+    return {
+      item: {},
+      imgList: []
+    };
+  },
+  methods: {
+    backFun() {
+      this.$router.back(-1);
+    }
+  },
+  mounted() {
+    const releaseId = this.$route.params.releaseId;
+    this.axios.post(`/user/releaseInfoById/${releaseId}`).then(res => {
+      if (res.data.returnCode == "SUCCESS") {
+        this.item = res.data.result;
+        this.imgList =  res.data.result.releaseImg ? res.data.result.releaseImg.split(',') : [];
+      }
+    });
+  }
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="scss">
+.detail {
+  .list-img.list-img{
+    width:100%;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    img{
+      width: 48%;
+      height: auto;
+      margin: 0 1%;
+      margin-bottom: 10px;
+          flex-grow: 1;
+
+    }
+  }
+  & > div:nth-child(2) {
+    overflow: hidden;
+    padding-top: 19px;
+    padding-bottom: 7px;
+    width: 325px;
+    overflow: hidden;
+    margin: 0 auto;
+
+    .header {
+      padding: 3px 0;
+      overflow: hidden;
+    }
+    img {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 5px #ccc;
+      float: left;
+      margin-left: 5px;
+    }
+    .list-text {
+      color: #9096a9;
+      font-size: 12px;
+      width: 200px;
+      float: left;
+      margin-left: 10px;
+      p:nth-child(1) {
+        color: #101010;
+        font-size: 16px;
+        font-weight: bold;
+      }
+      p:nth-child(3) {
+        color: #4a4a4a;
+        margin-top: 6px;
+      }
+    }
+    .right-pirce {
+      float: right;
+      text-align: right;
+      p:nth-child(1) {
+        color: #e53b33;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 15px;
+      }
+      p:nth-child(2) {
+        color: #9096a9;
+        font-size: 12px;
+      }
+    }
+    .list {
+      overflow: hidden;
+      clear: both;
+      width: 100%;
+      margin-top: 14px;
+      li {
+        width: 100%;
+        height: 47px;
+        line-height: 47px;
+        span {
+          float: left;
+          font-size: 16px;
+          &:nth-child(2) {
+            float: right;
+            text-align: right;
+          }
+          &:nth-child(1) {
+            font-weight: bold;
+          }
+        }
+      }
+    }
+  }
+  .submit-btn {
+    width: 325px;
+    height: 54px;
+    line-height: 54px;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bolder;
+    background: linear-gradient(
+      203deg,
+      rgba(248, 131, 39, 1) 0%,
+      rgba(224, 48, 91, 1) 100%
+    );
+    border-radius: 27px;
+    margin-top: 15px;
+    &.close-btn{
+      background: #ccc;
+    }
+  }
+
+}
+</style>

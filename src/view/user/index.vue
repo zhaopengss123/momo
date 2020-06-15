@@ -15,11 +15,13 @@
         <div class="card-main">
           <ul>
             <li>
-              <span>已上架</span>
+              <router-link to="/releaseInfo">
+              <span>我的发布</span>
+              </router-link>
             </li>
-            <li class="last">
+            <!-- <li class="last">
               <span>已下架</span>
-            </li>
+            </li> -->
           </ul>
         </div>
       </div>
@@ -184,6 +186,12 @@ export default {
       background-repeat: no-repeat;
       background-size: auto 25px;
       background-position: center top;
+      a{
+        display: block;
+        width: 100%;
+        height: 100%;
+        color: inherit;
+      }
     }
     &:nth-child(1) {
       li.last {
