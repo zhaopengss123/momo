@@ -31,22 +31,34 @@
         <div class="card-main">
           <ul>
             <li>
-              <span>待支付</span>
+              <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 1, titles: '待支付' } }">
+                <span>待支付</span>
+              </router-link>
             </li>
             <li>
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 2, titles: '待发货' } }">
               <span>待发货</span>
+             </router-link>
             </li>
             <li>
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 3, titles: '待审核' } }">
               <span>待审核</span>
+             </router-link>
             </li>
             <li>
-              <span>审核失败</span>
+             <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 5, titles: '审核中' } }">
+              <span>审核中</span>
+            </router-link>
             </li>
             <li>
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 4, titles: '交易成功' } }">
               <span>交易成功</span>
+            </router-link>
             </li>
             <li>
+             <router-link :to="{ name: 'ShopList',params:{  releaseType: 1, titles: '全部订单' } }">
               <span>全部订单</span>
+              </router-link>
             </li>
           </ul>
         </div>
@@ -124,8 +136,11 @@ export default {
     margin-left: 25px;
     margin-top: 13px;
     margin-bottom: 30px;
-    a{
+    a {
       color: inherit;
+      display: block;
+      width: 100%;
+      height: 100%;
     }
     img {
       width: 56px;
@@ -144,7 +159,7 @@ export default {
           margin-top: 5px;
         }
         &:nth-child(2) {
-          color: #919BA5;
+          color: #919ba5;
           font-size: 12px;
           margin-top: 6px;
         }
@@ -186,7 +201,7 @@ export default {
       background-repeat: no-repeat;
       background-size: auto 25px;
       background-position: center top;
-      a{
+      a {
         display: block;
         width: 100%;
         height: 100%;

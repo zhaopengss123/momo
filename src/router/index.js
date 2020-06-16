@@ -10,6 +10,7 @@ import LoginComponent from '@/view/index/login'
 import BindphoneComponent from '@/view/user/bindphone'
 import ReleaseInfoComponent from '@/view/user/releaseInfo'
 import ReleaseDetailComponent from '@/view/user/list-detail/detail'
+import ShopListComponent from '@/view/user/shop-list'
 
 Vue.use(Router)
 
@@ -68,6 +69,11 @@ export default new Router({
       path: '/releasedetail',
       name: 'ReleaseDetail',
       component: ReleaseDetailComponent
+    },
+    {
+      path: '/shoplist',
+      name: 'ShopList',
+      component: ShopListComponent
     },
     
   ]

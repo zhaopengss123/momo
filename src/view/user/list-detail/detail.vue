@@ -81,8 +81,10 @@
       <div class="list-img" v-if="imgList.length">
         <img v-for="(item,index) in imgList" :key="index" :src="item">
       </div>
-      <div class="submit-btn">购买</div>
-      <div class="submit-btn close-btn">下架道具</div>
+      <div class="submit-btn" v-if="item.releaseStatus == 2">购买</div>
+      <div class="submit-btn close-btn" @click="dismount" v-if="item.releaseStatus == 1 ">下架道具</div>
+      <div class="submit-btn" v-if="item.releaseStatus == 4" @click="submitReceive">确认收货</div>
+
     </div>
   </div>
 </template>
@@ -100,14 +102,60 @@ export default {
   methods: {
     backFun() {
       this.$router.back(-1);
+    },
+    //下架道具
+    dismount() {
+      this.$dialog
+        .confirm({
+          title: "提示",
+          message: "确定下架该道具"
+        })
+        .then(() => {
+          this.axios
+            .post(`/release/dismount/${this.item.releasePropsId}`)
+            .then(res => {
+              if (res.data.returnCode == "SUCCESS") {
+                this.$toast.success("下架成功");
+              } else {
+                this.$toast.fail(res.data.returnMsg);
+              }
+            });
+        })
+        .catch(() => {
+          // on cancel
+        });
+    },
+    submitReceive() {
+      this.$dialog
+        .confirm({
+          title: "确认收货",
+          message: "确认收货后货款会到对方账户，请仔细核对"
+        })
+        .then(() => {
+          this.axios
+            .post(`/propsOrder/confirmGoods/${this.item.releasePropsId}`)
+            .then(res => {
+              if (res.data.returnCode == "SUCCESS") {
+                this.$toast.success("操作成功");
+              } else {
+                this.$toast.fail(res.data.returnMsg);
+              }
+            });
+        })
+        .catch(() => {
+          // on cancel
+        });
     }
   },
   mounted() {
     const releaseId = this.$route.params.releaseId;
+
     this.axios.post(`/user/releaseInfoById/${releaseId}`).then(res => {
       if (res.data.returnCode == "SUCCESS") {
         this.item = res.data.result;
-        this.imgList =  res.data.result.releaseImg ? res.data.result.releaseImg.split(',') : [];
+        this.imgList = res.data.result.releaseImg
+          ? res.data.result.releaseImg.split(",")
+          : [];
       }
     });
   }
@@ -117,18 +165,17 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .detail {
-  .list-img.list-img{
-    width:100%;
+  .list-img.list-img {
+    width: 100%;
     overflow: hidden;
     display: flex;
     flex-wrap: wrap;
-    img{
+    img {
       width: 48%;
       height: auto;
       margin: 0 1%;
       margin-bottom: 10px;
-          flex-grow: 1;
-
+      flex-grow: 1;
     }
   }
   & > div:nth-child(2) {
@@ -219,10 +266,9 @@ export default {
     );
     border-radius: 27px;
     margin-top: 15px;
-    &.close-btn{
+    &.close-btn {
       background: #ccc;
     }
   }
-
 }
 </style>

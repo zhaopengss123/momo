@@ -9,12 +9,14 @@ Vue.use(Vuex);
 export default () => {
   return new Vuex.Store({
     state:{
-      openId: 'osHzdt5mqVBHOA5gN_hO8TY1GZP8',
+      openId: '',
       phone: false,
       userInfo:{}
     },
     getters:{
-
+      getOpenid:state=>{
+        return state.openId;
+      }
     },
     mutations:{
       editOpenId(state,text){

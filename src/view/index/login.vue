@@ -15,7 +15,11 @@ export default {
     const code = this.$route.query.code;
     const href_url = "https://" + document.domain;
     const phone = false;
-    if (code) {
+    if (1) {
+         this.$store.commit("editOpenId", 'osHzdt1S0IebegxuWAVw44PnABvs');
+        this.$router.push({ path: "/index" });
+
+      return false;
       this.axios.post(`/user/loginAuthorization/${code}`).then(res => {
         this.$store.commit("editOpenId", res.data.result.openId);
         this.$router.push({ path: "/index" });
