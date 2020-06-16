@@ -47,7 +47,7 @@ export default {
     onSubmit(values) {
       
      this.axios.post(`/user/checkBindingPhone`,{
-        openId: getopenId(),
+        openId: this.$store.state.openId,
         phone: this.phone,
         code: this.code
       }).then(res => {
@@ -65,7 +65,7 @@ export default {
     let isMobile = /^1[3|4|5|7|8][0-9]\d{4,8}$/;
     if (isMobile.test(this.phone) && this.phone.length == 11) {
       this.axios.post(`/user/bindingPhone`,{
-        openId: getopenId(),
+        openId: this.$store.state.openId,
         phone: this.phone
       }).then(res => {
           // 发送成功

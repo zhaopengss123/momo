@@ -4,19 +4,18 @@
 
     <div class="list-main">
       <ul>
-        <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item.releasePropsId)">
-          <img :src="item.propsImgUrl" />
+        <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item.propsOrderId)">
+          <img :src="item.propsImgUlr" />
           <div class="list-text">
             <p>
               {{ item.titleDescribe }}
               <span v-if="item.releaseType == 1">售卖</span>
               <i v-if="item.releaseType == 0">求购</i>
             </p>
-            <p>状态：{{ item.releaseStatus == 1 ? '已上架' : item.releaseStatus == 0 ? '已下架' : item.releaseStatus == 2 ? '待付款' : item.releaseStatus == 3 ? '交易关闭' : item.releaseStatus == 4 ? '待审核' : item.releaseStatus == 5 ? '审核通过' : item.releaseStatus == 6 ? '审核失败' : '--' }}</p>
-            <p v-if="item.releaseStatus !=1 && item.releaseStatus !=0 ">{{ item.closeName }}</p>
+            <p></p>
+            <p>状态：{{ item.orderStatus == 1 ? '待付款' : item.orderStatus == 2 ? '已付款' : item.orderStatus == 3 ? '待发货' : item.orderStatus == 4 ? '已发货' : item.orderStatus == 5 ? '待确认' : item.orderStatus == 6 ? '交易成功' : item.orderStatus == 7 ? '交易关闭' :item.orderStatus == 8 ? '申诉中' :item.orderStatus == 9 ? '申诉成功' :item.orderStatus == 10 ? '申述失败' : '--' }}</p>
           </div>
           <div class="right-pirce">
-            <p>库存{{ item.originalStock }}</p>
           </div>
         </li>
       </ul>
@@ -25,15 +24,15 @@
 </template>
 
 <script>
-import { getopenId } from "@/assets/utils";
-
 export default {
   name: "ReleaseInfo",
   data() {
     return {
       toggleIndex: 1,
       dataList: [],
-      titleText: this.$route.params.titles
+      titleText: this.$route.params.titles,
+      releaseType: null,
+      orderStatus: null
     };
   },
   methods: {
@@ -42,10 +41,10 @@ export default {
     },
     getDList() {
       this.axios
-        .post(`/user/orderInfo/`, {
-          openId: getopenId(),
-          releaseType: this.$route.params.releaseType || null,
-          orderStatus: this.$route.params.orderStatus,
+        .post(`/user/orderInfo`, {
+          openId: this.$store.state.openId,
+          releaseType: this.releaseType || null,
+          orderStatus: this.orderStatus,
           pageNo: 1,
           pageSize: 10000
         })
@@ -63,7 +62,8 @@ export default {
     }
   },
   mounted() {
-    console.log(this.$route.params);
+    this.releaseType = this.$route.params.releaseType;
+    this.orderStatus = this.$route.params.orderStatus;
     this.getDList();
   }
 };

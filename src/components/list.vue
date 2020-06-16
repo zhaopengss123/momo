@@ -28,7 +28,7 @@
               <span v-if="item.releaseType == 1">售卖</span>
               <i v-if="item.releaseType == 0">求购</i>
             </p>
-            <!-- <p>最酷炫的道具之一</p> -->
+             <p>{{ item.titleDescribe }}</p>
             <p v-if="item.createTime">{{ item.createTime }} · 平台上传</p>
           </div>
           <div class="right-pirce">

@@ -31,6 +31,44 @@
         <div class="card-main">
           <ul>
             <li>
+              <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 1, titles: '待支付' } }">
+                <span>待支付</span>
+              </router-link>
+            </li>
+            <li>
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 2, titles: '待发货' } }">
+              <span>待发货</span>
+             </router-link>
+            </li>
+            <li>
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 3, titles: '待审核' } }">
+              <span>待审核</span>
+             </router-link>
+            </li>
+            <li>
+             <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 5, titles: '审核中' } }">
+              <span>审核中</span>
+            </router-link>
+            </li>
+            <li>
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 4, titles: '交易成功' } }">
+              <span>交易成功</span>
+            </router-link>
+            </li>
+            <li>
+             <router-link :to="{ name: 'ShopList',params:{  releaseType: 0, titles: '全部订单' } }">
+              <span>全部订单</span>
+              </router-link>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">我的售卖</div>
+        <div class="card-main">
+          <ul>
+         <li>
               <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 1, titles: '待支付' } }">
                 <span>待支付</span>
               </router-link>
@@ -63,32 +101,6 @@
           </ul>
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-title">我的售卖</div>
-        <div class="card-main">
-          <ul>
-            <li>
-              <span>已上架</span>
-            </li>
-            <li>
-              <span>已下架</span>
-            </li>
-            <li>
-              <span>待审核</span>
-            </li>
-            <li>
-              <span>审核失败</span>
-            </li>
-            <li>
-              <span>交易成功</span>
-            </li>
-            <li>
-              <span>全部订单</span>
-            </li>
-          </ul>
-        </div>
-      </div>
       <div class="card">
         <div class="card-title">联系客服</div>
       </div>
@@ -117,7 +129,7 @@ export default {
     if (this.$store.state.userInfo.userOpenId) {
       this.userInfo = this.$store.state.userInfo;
     } else {
-      this.axios.post(`/user/info/${getopenId()}`).then(res => {
+      this.axios.post(`/user/info/${this.$store.state.openId}`).then(res => {
         if (res.data.returnCode == "SUCCESS") {
           this.$store.commit("setUserInfo", res.data.result);
           this.userInfo = res.data.result;

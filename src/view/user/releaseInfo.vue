@@ -55,7 +55,7 @@ export default {
       this.axios
         .post(`/user/releaseInfo`, {
           type,
-          openId: getopenId(),
+          openId: this.$store.state.openId,
           pageNo: 1,
           pageSize: 1000
         })

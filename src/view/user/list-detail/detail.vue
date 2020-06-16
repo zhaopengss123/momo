@@ -55,7 +55,7 @@
           <li>
             <span>发布时间</span>
             <span>{{ item.createTime }}</span>
-          </li>          
+          </li>
           <li>
             <span>支付时间</span>
             <span>{{ item.payTime }}</span>
@@ -76,15 +76,30 @@
             <span>原因</span>
             <span>{{ item.closeName }}</span>
           </li>
+          <li v-if="item.releaseType == 1 && item.releaseStatus == 1">
+            <span>发货名</span>
+            <span>
+              <van-field v-model="sendGoodsName" placeholder="陌陌账号或者名字" />
+            </span>
+          </li>
+          <li v-if="item.releaseType == 1 && item.releaseStatus == 1">
+            <span>上传截图</span>
+            <span></span>
+          </li>
+          <van-uploader v-if="item.releaseType == 1 && item.releaseStatus == 1"  v-model="fileList" multiple />
         </ul>
       </div>
       <div class="list-img" v-if="imgList.length">
-        <img v-for="(item,index) in imgList" :key="index" :src="item">
+        <img v-for="(item,index) in imgList" :key="index" :src="item" />
       </div>
-      <div class="submit-btn" v-if="item.releaseStatus == 2">购买</div>
+      <div class="submit-btn" v-if="item.releaseStatus == 2">支付发布订单</div>
       <div class="submit-btn close-btn" @click="dismount" v-if="item.releaseStatus == 1 ">下架道具</div>
-      <div class="submit-btn" v-if="item.releaseStatus == 4" @click="submitReceive">确认收货</div>
-
+      <div
+        class="submit-btn"
+        v-if="item.releaseStatus == 4 && item.releaseType != 1"
+        @click="submitReceive"
+      >确认收货</div>
+      <div class="submit-btn" v-if="item.releaseType == 1 && item.releaseStatus == 1" @click="sendGoods()">去发货</div>
     </div>
   </div>
 </template>
@@ -96,12 +111,44 @@ export default {
   data() {
     return {
       item: {},
-      imgList: []
+      imgList: [],
+      fileList: [],
+      sendGoodsName: ""
     };
   },
   methods: {
     backFun() {
-      this.$router.back(-1);
+      this.$router.back(-2);
+    },
+    sendGoods(){
+      if(!this.sendGoodsName){
+        this.$toast.fail('请输入发货名');
+        return false;
+      }
+      this.$dialog
+        .confirm({
+          title: "提示",
+          message: "确认发货？"
+        })
+        .then(() => {
+          this.axios
+            .post(`/propsOrder/sendGoods`,{
+              propsOrderId: this.item.releasePropsId,
+              openId: this.$store.state.openId,
+              imgUrl: this.fileList.join(','),
+              sendGoodsName: this.sendGoodsName
+            })
+            .then(res => {
+              if (res.data.returnCode == "SUCCESS") {
+                this.$toast.success("下架成功");
+              } else {
+                this.$toast.fail(res.data.returnMsg);
+              }
+            });
+        })
+        .catch(() => {
+          // on cancel
+        });
     },
     //下架道具
     dismount() {
@@ -242,7 +289,10 @@ export default {
           font-size: 16px;
           &:nth-child(2) {
             float: right;
-            text-align: right;
+            text-align: right !important;
+            .van-field__control {
+              text-align: right;
+            }
           }
           &:nth-child(1) {
             font-weight: bold;

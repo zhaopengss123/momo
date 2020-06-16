@@ -287,7 +287,7 @@ export default {
         stock: null,
         describe: null,
         distributionTime: TransfromDateTimes(),
-        openId: getopenId()
+        openId: this.$store.state.openId
       },
       sceneInfo: `{"h5_info”:{"wap_url”:"https://momo.beituokj.com”,”type”:”Wap”,”wap_name”:”充值支付”}}`
     };
@@ -295,7 +295,7 @@ export default {
   methods: {
     afterRead(file) {
       let formData = new FormData();
-      formData.append("openId", getopenId());
+      formData.append("openId", this.$store.state.openId);
       formData.append("releasePropsId", this.selectClass.id);
       let config = {
         headers: {
@@ -341,7 +341,7 @@ export default {
           guestsId: this.form1.guestsId,
           stock: this.form1.stock,
           describe: this.form1.describe,
-          openId: getopenId(),
+          openId: this.$store.state.openId,
           titleDescribe: this.form1.titleDescribe,
           sceneInfo: this.sceneInfo,
           distributionTime: this.form1.distributionTime
@@ -354,7 +354,7 @@ export default {
               "getBrandWCPayRequest",
               {
                 appId:  res.data.result.appId, //公众号名称，由商户传入
-                timeStamp: res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                timeStamp: ''+res.data.result.timeStamp, //时间戳，自1970年以来的秒数
                 nonceStr: res.data.result.nonceStr, //随机串
                 package: res.data.result.packages,
                 signType:  res.data.result.signType, //微信签名方式：
@@ -384,7 +384,7 @@ export default {
           unitPrice: this.form2.unitPrice,
           stock: this.form2.stock,
           describe: this.form2.describe,
-          openId: getopenId(),
+          openId: this.$store.state.openId,
           titleDescribe: this.form2.titleDescribe
         })
         .then(res => {
@@ -394,7 +394,7 @@ export default {
               "getBrandWCPayRequest",
               {
                 appId:  res.data.result.appId, //公众号名称，由商户传入
-                timeStamp: res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                timeStamp: ''+res.data.result.timeStamp, //时间戳，自1970年以来的秒数
                 nonceStr: res.data.result.nonceStr, //随机串
                 package: res.data.result.packages,
                 signType:  res.data.result.signType, //微信签名方式：

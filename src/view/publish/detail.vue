@@ -185,7 +185,7 @@ export default {
           deliveryTime: this.form1.deliveryTime,
 
           releasePropsId: this.item.releaseId,
-          userOpenId: getopenId(),
+          userOpenId: this.$store.state.openId,
           stock: this.stock,
           leavingMsg: this.leavingMsg,
           sceneInfo:
@@ -197,7 +197,7 @@ export default {
               "getBrandWCPayRequest",
               {
                 appId: res.data.result.appId, //公众号名称，由商户传入
-                timeStamp: res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                timeStamp: ''+res.data.result.timeStamp, //时间戳，自1970年以来的秒数
                 nonceStr: res.data.result.nonceStr, //随机串
                 package: res.data.result.packages,
                 signType: res.data.result.signType, //微信签名方式：
@@ -220,7 +220,7 @@ export default {
       this.axios
         .post(`/propsOrder/sell`, {
           releasePropsId: this.item.releaseId,
-          userOpenId: getopenId(),
+          userOpenId: this.$store.state.openId,
           stock: this.stock,
           leavingMsg: this.leavingMsg,
           sceneInfo:
@@ -232,7 +232,7 @@ export default {
               "getBrandWCPayRequest",
               {
                 appId: res.data.result.appId, //公众号名称，由商户传入
-                timeStamp: res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                timeStamp: ''+res.data.result.timeStamp, //时间戳，自1970年以来的秒数
                 nonceStr: res.data.result.nonceStr, //随机串
                 package: res.data.result.packages,
                 signType: res.data.result.signType, //微信签名方式：
