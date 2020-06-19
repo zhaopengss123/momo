@@ -21,7 +21,6 @@ import store from '../../store-conf';
     return time;
 });
 export const getopenId= ()=>{
-    console.log(store().getters());
     const openId = store.getters().getopenId;
     return openId;
 }

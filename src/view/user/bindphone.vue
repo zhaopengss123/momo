@@ -19,7 +19,7 @@
         :rules="[{ required: true, message: '请填写验证码' }]"
       >
         <template #button>
-          <van-button size="small" plain type="info" @click="sendCode">发送验证码</van-button>
+          <van-button size="small" plain type="info" native-type="button" :disabled="getCodeTime != 60" @click="sendCode">{{ getCodeTime == 60 ? '发送验证码' : getCodeTime+'s' }}</van-button>
         </template>
       </van-field>
       <div style="margin: 16px;">
@@ -37,7 +37,8 @@ export default {
   data() {
     return {
       phone: "",
-      code: ""
+      code: "",
+      getCodeTime: 60,
     };
   },
   methods: {
@@ -45,7 +46,6 @@ export default {
       this.$router.back(-1);
     },
     onSubmit(values) {
-      
      this.axios.post(`/user/checkBindingPhone`,{
         openId: this.$store.state.openId,
         phone: this.phone,
@@ -56,6 +56,7 @@ export default {
             let userInfo = this.$store.state.userInfo;
             userInfo.phone = this.phone;
             this.$store.commit("setUserInfo", userInfo);
+            this.$router.push('/user')
         }else{
           this.$toast.fail(res.data.returnMsg);
         }
@@ -71,14 +72,23 @@ export default {
           // 发送成功
            if (res.data.returnCode == "SUCCESS") {
              this.$toast.success('发送成功');
+             this.setIntervalCode();
            }else{
-             this.$toast.fail('发送失败');
+             this.$toast.fail(res.data.returnMsg);
            }
       });
     }else{
       this.$toast.fail('请输入正确的手机号');
     }
-    }
+    },
+      /* ---------------- 倒计时 ---------------- */
+  setIntervalCode() {
+    let interval = setInterval(_ => {
+      let getCodeTime = this.getCodeTime - 1;
+      this.getCodeTime  = getCodeTime;
+      if (getCodeTime <= 0) { clearInterval(interval); this.getCodeTime = 60 }
+    }, 1000)
+  },
   },
   mounted() {}
 };

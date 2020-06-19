@@ -25,7 +25,7 @@
               <i v-if="item.releaseType == 0">求购</i>
             </p>
             <p>状态：{{ item.releaseStatus == 1 ? '已上架' : item.releaseStatus == 0 ? '已下架' : item.releaseStatus == 2 ? '待付款' : item.releaseStatus == 3 ? '交易关闭' : item.releaseStatus == 4 ? '待审核' : item.releaseStatus == 5 ? '审核通过' : item.releaseStatus == 6 ? '审核失败' : '--' }}</p>
-            <p v-if="item.releaseStatus !=1 && item.releaseStatus !=0 ">{{ item.closeName }}</p>
+            <p v-if="item.releaseStatus !=1">{{ item.closeName }}</p>
           </div>
           <div class="right-pirce">
             <p>库存{{ item.originalStock }}</p>
@@ -37,7 +37,6 @@
 </template>
 
 <script>
-import { getopenId } from "@/assets/utils";
 
 export default {
   name: "ReleaseInfo",

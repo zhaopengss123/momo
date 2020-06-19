@@ -16,17 +16,25 @@
       </div>
       <div class="list">
         <ul>
-          <!-- <li>
-            <span>截止时间</span>
-            <span></span>
-          </li>-->
           <li>
-            <span>求购金额</span>
+            <span>类型</span>
+            <span>{{ item.releaseType == 1 ? '售卖' :'求购'  }}</span>
+          </li>
+          <li>
+            <span>单价</span>
             <span>{{ item.unitPrice }}/份</span>
           </li>
           <li>
             <span>数量</span>
             <span>{{ item.stock }}</span>
+          </li>
+           <li>
+            <span>商品描述</span>
+            <span>{{ item.propsDescribe }}</span>
+          </li>          
+           <li>
+            <span>配送方式</span>
+            <span>{{ item.deliveryTypeName }}</span>
           </li>
           <li>
             <span>合计金额</span>
@@ -36,33 +44,13 @@
       </div>
       <div class="submit-btn" @click="sbumitsBtn()">购买</div>
     </div>
-    <!-- 求购 -->
+    <!-- 购买 -->
     <van-popup
       v-model="showPop"
       position="bottom"
       :style="{ height: 'auto',paddingTop:'10px',paddingBottom: '10px' }"
     >
-      <van-form @submit="onSubmit">
-        <van-field name="stepper" label="售卖数量">
-          <template #input>
-            <van-stepper v-model="stock" min="1" :max="item.stock" integer />
-          </template>
-        </van-field>
-
-        <van-field v-model="leavingMsg" name="leavingMsg" label="备注" placeholder="备注" />
-
-        <div style="margin: 16px;">
-          <van-button round block type="info" native-type="submit">提交</van-button>
-        </div>
-      </van-form>
-    </van-popup>
-    <!-- 售卖 -->
-    <van-popup
-      v-model="showPop2"
-      position="bottom"
-      :style="{ height: 'auto',paddingTop:'10px',paddingBottom: '10px' }"
-    >
-      <van-form @submit="onSubmit2">
+          <van-form @submit="onSubmit">
         <van-field name="stepper" label="售卖数量">
           <template #input>
             <van-stepper v-model="stock" min="1" :max="item.stock" integer />
@@ -101,6 +89,26 @@
           placeholder="点击选择配送时间"
           @click="showPickertime1 = true"
         />
+        <van-field v-model="leavingMsg" name="leavingMsg" label="备注" placeholder="备注" />
+
+        <div style="margin: 16px;">
+          <van-button round block type="info" native-type="submit">提交</van-button>
+        </div>
+      </van-form>
+    </van-popup>
+    <!-- 售卖 -->
+    <van-popup
+      v-model="showPop2"
+      position="bottom"
+      :style="{ height: 'auto',paddingTop:'10px',paddingBottom: '10px' }"
+    >
+    <van-form @submit="onSubmit2">
+        <van-field name="stepper" label="售卖数量">
+          <template #input>
+            <van-stepper v-model="stock" min="1" :max="item.stock" integer />
+          </template>
+        </van-field>
+
         <van-field v-model="leavingMsg" name="leavingMsg" label="备注" placeholder="备注" />
 
         <div style="margin: 16px;">
@@ -166,24 +174,23 @@ export default {
     },
     sbumitsBtn() {
       if (this.releaseType == 0) {
-        this.showPop = true;
-      } else {
         this.showPop2 = true;
+      } else {
+        this.showPop = true;
       }
     },
     backFun() {
       this.$router.back(-1);
     },
 
-    onSubmit2() {
+    onSubmit() {
       const that = this;
       this.axios
-        .post(`/propsOrder/sell`, {
+        .post(`/propsOrder/buy`, {
           roomNumber: this.form1.roomNumber,
           guestsId: this.form1.guestsId,
           anchorName: this.form1.anchorName,
           deliveryTime: this.form1.deliveryTime,
-
           releasePropsId: this.item.releaseId,
           userOpenId: this.$store.state.openId,
           stock: this.stock,
@@ -215,7 +222,7 @@ export default {
         });
     },
 
-    onSubmit() {
+    onSubmit2() {
       const that = this;
       this.axios
         .post(`/propsOrder/sell`, {

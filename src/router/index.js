@@ -11,6 +11,7 @@ import BindphoneComponent from '@/view/user/bindphone'
 import ReleaseInfoComponent from '@/view/user/releaseInfo'
 import ReleaseDetailComponent from '@/view/user/list-detail/detail'
 import ShopListComponent from '@/view/user/shop-list'
+import BuyDetailComponent from '@/view/user/list-detail/buydetail'
 
 Vue.use(Router)
 
@@ -75,6 +76,12 @@ export default new Router({
       name: 'ShopList',
       component: ShopListComponent
     },
+    {
+      path: '/buydetail',
+      name: 'Buydetail',
+      component: BuyDetailComponent
+    }
+    
     
   ]
 })

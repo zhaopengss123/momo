@@ -58,7 +58,7 @@ export default {
         });
     },
     toDetail(releaseId) {
-      this.$router.push({ name: "ReleaseDetail", params: { releaseId } });
+      this.$router.push({ name: "Buydetail", params: { releaseId } });
     }
   },
   mounted() {

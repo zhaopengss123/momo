@@ -4,9 +4,11 @@
     <div class="header">
       <img :src="userInfo.userHeadImgUrl" alt />
       <div>
-        <span>{{ userInfo.nickName }}</span>
-        <span v-if="userInfo.phone">{{ userInfo.phone }}</span>
-        <span v-else><router-link to="/bindphone">未绑定 ></router-link></span>
+        <div class="header-top"><span>{{ userInfo.nickName }}</span><span v-if="userInfo.phone">{{ userInfo.phone }}</span><span v-else><router-link to="/bindphone">未绑定 ></router-link></span></div>
+        <div class="header-bottom">
+          <span>￥{{ userInfo.userTotalPrice || 0 }}</span>
+          <span>去提现 ></span>
+        </div>
       </div>
     </div>
     <div>
@@ -30,35 +32,41 @@
         <div class="card-title">我的购买</div>
         <div class="card-main">
           <ul>
-            <li>
+            <li :class="buyNumberFun(1) ? 'active' : ''">
               <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 1, titles: '待支付' } }">
                 <span>待支付</span>
               </router-link>
+              <i></i>
             </li>
-            <li>
+            <li :class="buyNumberFun(3) ? 'active' : ''">
             <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 2, titles: '待发货' } }">
               <span>待发货</span>
              </router-link>
+             <i></i>
             </li>
-            <li>
+            <li :class="buyNumberFun(5) ? 'active' : ''">
             <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 3, titles: '待审核' } }">
               <span>待审核</span>
              </router-link>
+             <i></i>
             </li>
-            <li>
+            <li :class="buyNumberFun(8) ? 'active' : ''">
              <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 5, titles: '审核中' } }">
-              <span>审核中</span>
+              <span>申诉中</span>
             </router-link>
+            <i></i>
             </li>
             <li>
             <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 4, titles: '交易成功' } }">
               <span>交易成功</span>
             </router-link>
+            <i></i>
             </li>
             <li>
              <router-link :to="{ name: 'ShopList',params:{  releaseType: 0, titles: '全部订单' } }">
               <span>全部订单</span>
               </router-link>
+              <i></i>
             </li>
           </ul>
         </div>
@@ -68,35 +76,41 @@
         <div class="card-title">我的售卖</div>
         <div class="card-main">
           <ul>
-         <li>
+            <li :class="sellNumberFun(1) ? 'active' : ''">
               <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 1, titles: '待支付' } }">
                 <span>待支付</span>
               </router-link>
+              <i></i>
             </li>
-            <li>
+            <li :class="sellNumberFun(3) ? 'active' : ''">
             <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 2, titles: '待发货' } }">
               <span>待发货</span>
              </router-link>
+             <i></i>
             </li>
-            <li>
+            <li :class="sellNumberFun(5) ? 'active' : ''">
             <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 3, titles: '待审核' } }">
               <span>待审核</span>
              </router-link>
+             <i></i>
             </li>
-            <li>
+            <li :class="sellNumberFun(8) ? 'active' : ''">
              <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 5, titles: '审核中' } }">
-              <span>审核中</span>
+              <span>申诉中</span>
             </router-link>
+            <i></i>
             </li>
             <li>
             <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 4, titles: '交易成功' } }">
               <span>交易成功</span>
             </router-link>
+            <i></i>
             </li>
             <li>
              <router-link :to="{ name: 'ShopList',params:{  releaseType: 1, titles: '全部订单' } }">
               <span>全部订单</span>
               </router-link>
+              <i></i>
             </li>
           </ul>
         </div>
@@ -120,7 +134,9 @@ export default {
   name: "Index",
   data() {
     return {
-      userInfo: {}
+      userInfo: {},
+      sellNumber:[],
+      buyNumber: []
     };
   },
   components: { footerComponent },
@@ -135,6 +151,44 @@ export default {
           this.userInfo = res.data.result;
         }
       });
+            this.axios.post(`/user/sellOrderNum/${this.$store.state.openId}`).then(res => {
+        if (res.data.returnCode == "SUCCESS") {
+            this.sellNumber = res.data.result;
+        }
+      });
+            this.axios.post(`/user/buyOrderNum/${this.$store.state.openId}`).then(res => {
+        if (res.data.returnCode == "SUCCESS") {
+            this.buyNumber = res.data.result;
+        }
+      });
+
+
+    }
+  },
+  computed:{
+    buyNumberFun(){
+      const that = this;
+        return function(data){
+        let blon = false;
+        that.buyNumber.map(item=>{
+          if(data == item.orderStatus){
+            blon = true;
+          }
+        })
+          return blon;
+        }
+    },
+    sellNumberFun(){
+      const that = this;
+        return function(data){
+        let blon = false;
+        that.sellNumber.map(item=>{
+          if(data == item.orderStatus){
+            blon = true;
+          }
+        })
+          return blon;
+        }
     }
   }
 };
@@ -163,8 +217,8 @@ export default {
     div {
       float: left;
       margin-left: 10px;
-      span {
-        display: block;
+      .header-top{
+       span {
         &:nth-child(1) {
           color: #373c41;
           font-size: 16px;
@@ -174,8 +228,25 @@ export default {
           color: #919ba5;
           font-size: 12px;
           margin-top: 6px;
+          margin-left:10px;
         }
       }
+      }
+      .header-bottom{
+        display:block;
+        clear:both;
+        span:nth-child(1){
+          color:#E53B33;
+          font-size: 16px;
+          padding-bottom:3px;
+        }
+        span:nth-child(2){
+          color: #919BA5;
+          font-size:12px;
+          margin-left:10px;
+        }
+      }
+
     }
   }
   .card {
@@ -213,12 +284,26 @@ export default {
       background-repeat: no-repeat;
       background-size: auto 25px;
       background-position: center top;
+      position: relative;
       a {
         display: block;
         width: 100%;
         height: 100%;
         color: inherit;
       }
+      &.active{
+              i{
+        position: absolute;
+        top: 0;
+        right:20px;
+        width:5px;
+        height:5px;
+        border-radius: 50%;
+        background:red;
+        display:block;
+      }
+      }
+
     }
     &:nth-child(1) {
       li.last {

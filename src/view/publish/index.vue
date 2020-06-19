@@ -106,7 +106,7 @@
           placeholder="数量"
           :rules="[{ required: true, message: '请填写数量' }]"
         />
-        <!-- <van-field
+         <van-field
           name="form1.imgUrl"
           label="道具图片"
           :rules="[{ required: true, message: '请填写道具图片' }]"
@@ -114,7 +114,7 @@
           <template #input>
             <van-uploader v-model="customerImg" :max-count="1" :after-read="afterRead" />
           </template>
-        </van-field>-->
+        </van-field>
         <van-field
           v-model="form1.describe"
           name="道具描述"
@@ -243,6 +243,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 import { TransfromDateTimes, getopenId } from "@/assets/utils";
 export default {
   name: "Index",
@@ -293,16 +294,21 @@ export default {
     };
   },
   methods: {
-    afterRead(file) {
-      let formData = new FormData();
-      formData.append("openId", this.$store.state.openId);
-      formData.append("releasePropsId", this.selectClass.id);
-      let config = {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      };
-      this.axios.post(`/release/uploadImg`, formData, config).then(res => {});
+    afterRead(files) {
+      let file = files.file;
+      let param = new FormData(); 
+      param.append('file',file,file.name); 
+      param.append('openId',this.$store.state.openId);   
+       param.append('releasePropsId',this.selectClass.id);
+    const instance=axios.create({
+       withCredentials: true,
+       headers: {'Content-Type': 'multipart/form-data'}
+    })
+      // this.axios.post(`/release/uploadImg`, formData, config).then(res => {});
+      instance.post('/release/uploadImg',param)
+          .then(response=>{
+              console.log(response.data);
+          })   
     },
     onConfirm(val) {
       this.form1.deliveryTypeId = val.id;

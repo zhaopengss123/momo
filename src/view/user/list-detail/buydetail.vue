@@ -80,12 +80,29 @@
             <span>原因</span>
             <span>{{ item.closeName }}</span>
           </li>
-          </ul>
+          <li v-if="item.releaseType == 1 && item.releaseStatus == 1">
+            <span>发货名</span>
+            <span>
+              <van-field v-model="sendGoodsName" placeholder="陌陌账号或者名字" />
+            </span>
+          </li>
+          <li v-if="item.releaseType == 1 && item.releaseStatus == 1">
+            <span>上传截图</span>
+            <span></span>
+          </li>
+          <van-uploader v-if="item.releaseType == 1 && item.releaseStatus == 1"  v-model="fileList" multiple />
+        </ul>
       </div>
-
+      <div class="list-img" v-if="imgList.length">
+        <img v-for="(item,index) in imgList" :key="index" :src="item" />
+      </div>
       <div class="submit-btn" v-if="item.releaseStatus == 2">支付发布订单</div>
-      <div class="submit-btn close-btn" @click="dismount" v-if="item.releaseStatus == 1 ">下架道具</div>
-
+      <div
+        class="submit-btn"
+        v-if="item.releaseStatus == 4 && item.releaseType != 1"
+        @click="submitReceive"
+      >确认收货</div>
+      <div class="submit-btn" v-if="item.releaseType == 1 && item.releaseStatus == 1" @click="sendGoods()">去发货</div>
     </div>
   </div>
 </template>
