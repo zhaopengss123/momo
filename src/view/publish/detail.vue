@@ -18,21 +18,21 @@
         <ul>
           <li>
             <span>类型</span>
-            <span>{{ item.releaseType == 1 ? '售卖' :'求购'  }}</span>
+            <span>{{ item.releaseType == 1 ? '售卖' :'求购' }}</span>
           </li>
           <li>
             <span>单价</span>
-            <span>{{ item.unitPrice }}/份</span>
+            <span>{{ item.unitPrice }}</span>
           </li>
           <li>
             <span>数量</span>
             <span>{{ item.stock }}</span>
           </li>
-           <li>
+          <li>
             <span>商品描述</span>
             <span>{{ item.propsDescribe }}</span>
-          </li>          
-           <li>
+          </li>
+          <li>
             <span>配送方式</span>
             <span>{{ item.deliveryTypeName }}</span>
           </li>
@@ -50,7 +50,7 @@
       position="bottom"
       :style="{ height: 'auto',paddingTop:'10px',paddingBottom: '10px' }"
     >
-          <van-form @submit="onSubmit">
+      <van-form @submit="onSubmit">
         <van-field name="stepper" label="售卖数量">
           <template #input>
             <van-stepper v-model="stock" min="1" :max="item.stock" integer />
@@ -72,6 +72,15 @@
           label="嘉宾"
           placeholder="点击选择嘉宾"
           @click="showguestsPicker = true"
+        />
+        <van-field
+          readonly
+          clickable
+          name="picker"
+          :value="form1.deliveryTypeName"
+          label="配送方式"
+          placeholder="点击选择配送方式"
+          @click="showPicker = true"
         />
         <van-field
           v-model="form1.anchorName"
@@ -102,7 +111,7 @@
       position="bottom"
       :style="{ height: 'auto',paddingTop:'10px',paddingBottom: '10px' }"
     >
-    <van-form @submit="onSubmit2">
+      <van-form @submit="onSubmit2">
         <van-field name="stepper" label="售卖数量">
           <template #input>
             <van-stepper v-model="stock" min="1" :max="item.stock" integer />
@@ -135,6 +144,15 @@
         @cancel="showguestsPicker = false"
       />
     </van-popup>
+
+    <van-popup v-model="showPicker" position="bottom">
+      <van-picker
+        show-toolbar
+        :columns="deliveryList"
+        @confirm="onConfirm"
+        @cancel="showPicker = false"
+      />
+    </van-popup>
   </div>
 </template>
 
@@ -152,17 +170,39 @@ export default {
       showguestsPicker: false,
       showPickertime1: false,
       showPop2: false,
+      deliveryList: [],
       distributionTime: new Date(),
       guestsList: [],
+      showPicker: false,
       form1: {
         roomNumber: null,
         guestsId: null,
         anchorName: null,
-        distributionTime: TransfromDateTimes()
+        distributionTime: TransfromDateTimes(),
+        deliveryTypeId: null,
+        deliveryTypeName: null
       }
     };
   },
   methods: {
+    getDelivery() {
+      this.axios.post(`/delivery/all`).then(res => {
+        if (res.data.returnCode == "SUCCESS") {
+          let deliveryList = [];
+          res.data.result.map(item => {
+            item.value = item.id;
+            item.text = item.name;
+            deliveryList.push(item);
+          });
+          this.deliveryList = deliveryList;
+        }
+      });
+    },
+    onConfirm(val) {
+      this.form1.deliveryTypeId = val.id;
+      this.form1.deliveryTypeName = val.name;
+      this.showPicker = false;
+    },
     onConfirmGuests(val) {
       this.form1.guestsId = val.id;
       this.form1.guestsName = val.text;
@@ -190,9 +230,10 @@ export default {
           roomNumber: this.form1.roomNumber,
           guestsId: this.form1.guestsId,
           anchorName: this.form1.anchorName,
-          deliveryTime: this.form1.deliveryTime,
+          deliveryTime: this.form1.distributionTime,
           releasePropsId: this.item.releaseId,
           userOpenId: this.$store.state.openId,
+          deliveryTypeId: this.form1.deliveryTypeId,
           stock: this.stock,
           leavingMsg: this.leavingMsg,
           sceneInfo:
@@ -204,7 +245,7 @@ export default {
               "getBrandWCPayRequest",
               {
                 appId: res.data.result.appId, //公众号名称，由商户传入
-                timeStamp: ''+res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                timeStamp: "" + res.data.result.timeStamp, //时间戳，自1970年以来的秒数
                 nonceStr: res.data.result.nonceStr, //随机串
                 package: res.data.result.packages,
                 signType: res.data.result.signType, //微信签名方式：
@@ -216,7 +257,7 @@ export default {
                 }
               }
             );
-          }else{
+          } else {
             this.$dialog({ message: res.data.returnMsg });
           }
         });
@@ -239,7 +280,7 @@ export default {
               "getBrandWCPayRequest",
               {
                 appId: res.data.result.appId, //公众号名称，由商户传入
-                timeStamp: ''+res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                timeStamp: "" + res.data.result.timeStamp, //时间戳，自1970年以来的秒数
                 nonceStr: res.data.result.nonceStr, //随机串
                 package: res.data.result.packages,
                 signType: res.data.result.signType, //微信签名方式：
@@ -251,7 +292,7 @@ export default {
                 }
               }
             );
-          }else{
+          } else {
             this.$dialog({ message: res.data.returnMsg });
           }
         });
@@ -265,6 +306,7 @@ export default {
         this.item = res.data.result;
       }
     });
+    this.getDelivery();
     this.axios.post(`/guestsInfo/all`).then(res => {
       if (res.data.returnCode == "SUCCESS") {
         let guestsList = [];

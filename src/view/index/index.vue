@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    <van-nav-bar title="momo道具城" />
+    <van-nav-bar title="陌陌道具城" />
     <div class="seach">
       <input type="text" v-model="propsName" placeholder="输入关键字" />
     </div>

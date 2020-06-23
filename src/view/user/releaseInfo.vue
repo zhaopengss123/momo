@@ -20,15 +20,18 @@
           <img :src="item.propsImgUrl" />
           <div class="list-text">
             <p>
-              {{ item.titleDescribe }}
+              {{ item.propsName }}
               <span v-if="item.releaseType == 1">售卖</span>
               <i v-if="item.releaseType == 0">求购</i>
+            </p>
+            <p>
+              {{ item.titleDescribe }}
             </p>
             <p>状态：{{ item.releaseStatus == 1 ? '已上架' : item.releaseStatus == 0 ? '已下架' : item.releaseStatus == 2 ? '待付款' : item.releaseStatus == 3 ? '交易关闭' : item.releaseStatus == 4 ? '待审核' : item.releaseStatus == 5 ? '审核通过' : item.releaseStatus == 6 ? '审核失败' : '--' }}</p>
             <p v-if="item.releaseStatus !=1">{{ item.closeName }}</p>
           </div>
           <div class="right-pirce">
-            <p>库存{{ item.originalStock }}</p>
+            <p>库存{{ item.dynamicStock }}</p>
           </div>
         </li>
       </ul>

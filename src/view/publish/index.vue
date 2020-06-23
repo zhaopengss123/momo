@@ -106,7 +106,7 @@
           placeholder="数量"
           :rules="[{ required: true, message: '请填写数量' }]"
         />
-         <van-field
+          <van-field
           name="form1.imgUrl"
           label="道具图片"
           :rules="[{ required: true, message: '请填写道具图片' }]"
@@ -114,7 +114,7 @@
           <template #input>
             <van-uploader v-model="customerImg" :max-count="1" :after-read="afterRead" />
           </template>
-        </van-field>
+        </van-field> 
         <van-field
           v-model="form1.describe"
           name="道具描述"
@@ -302,7 +302,7 @@ export default {
        param.append('releasePropsId',this.selectClass.id);
     const instance=axios.create({
        withCredentials: true,
-       headers: {'Content-Type': 'multipart/form-data'}
+       headers: {"Accept": "*/*",}
     })
       // this.axios.post(`/release/uploadImg`, formData, config).then(res => {});
       instance.post('/release/uploadImg',param)

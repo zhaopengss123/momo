@@ -60,7 +60,7 @@
             <span>支付时间</span>
             <span>{{ item.payTime }}</span>
           </li>
-          <li>
+          <li v-if="item.downShelfTime">
             <span>下架时间</span>
             <span>{{ item.downShelfTime }}</span>
           </li>
@@ -80,7 +80,7 @@
             <span>原因</span>
             <span>{{ item.closeName }}</span>
           </li>
-          </ul>
+        </ul>
       </div>
 
       <div class="submit-btn" v-if="item.releaseStatus == 2">支付发布订单</div>
@@ -104,11 +104,11 @@ export default {
   },
   methods: {
     backFun() {
-      this.$router.back(-2);
+      this.$router.back(-1);
     },
-    sendGoods(){
-      if(!this.sendGoodsName){
-        this.$toast.fail('请输入发货名');
+    sendGoods() {
+      if (!this.sendGoodsName) {
+        this.$toast.fail("请输入发货名");
         return false;
       }
       this.$dialog
@@ -118,15 +118,18 @@ export default {
         })
         .then(() => {
           this.axios
-            .post(`/propsOrder/sendGoods`,{
+            .post(`/propsOrder/sendGoods`, {
               propsOrderId: this.item.releasePropsId,
               openId: this.$store.state.openId,
-              imgUrl: this.fileList.join(','),
+              imgUrl: this.fileList.join(","),
               sendGoodsName: this.sendGoodsName
             })
             .then(res => {
               if (res.data.returnCode == "SUCCESS") {
-                this.$toast.success("下架成功");
+                this.$toast.success("发货成功");
+                setTimeout(() => {
+                  this.$router.back(-1);
+                }, 1500);
               } else {
                 this.$toast.fail(res.data.returnMsg);
               }
@@ -149,6 +152,9 @@ export default {
             .then(res => {
               if (res.data.returnCode == "SUCCESS") {
                 this.$toast.success("下架成功");
+                setTimeout(() => {
+                  this.$router.back(-1);
+                }, 1500);
               } else {
                 this.$toast.fail(res.data.returnMsg);
               }
@@ -170,6 +176,9 @@ export default {
             .then(res => {
               if (res.data.returnCode == "SUCCESS") {
                 this.$toast.success("操作成功");
+                setTimeout(() => {
+                  this.$router.back(-1);
+                }, 1500);
               } else {
                 this.$toast.fail(res.data.returnMsg);
               }
@@ -182,7 +191,6 @@ export default {
   },
   mounted() {
     const releaseId = this.$route.params.releaseId;
-
     this.axios.post(`/user/releaseInfoById/${releaseId}`).then(res => {
       if (res.data.returnCode == "SUCCESS") {
         this.item = res.data.result;

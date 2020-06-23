@@ -1,32 +1,37 @@
 <template>
   <div class="detail">
     <van-nav-bar title="道具详情" left-arrow @click-left="backFun" />
+
     <div>
+    <van-steps :active="active" active-color="#e0305b">
+      <van-step>待支付</van-step>
+      <van-step>代发货</van-step>
+      <van-step>待审核</van-step>
+      <van-step>交易成功</van-step>
+    </van-steps>
+
+      
+
       <div class="header">
-        <img :src="item.propsImgUrl" />
+        <img :src="item.propsImgUlr" />
         <div class="list-text">
           <p>{{ item.propsName }}</p>
           <p>{{ item.titleDescribe }}</p>
           <p v-if="item.createTime">{{ item.createTime }} · 平台上传</p>
         </div>
         <div class="right-pirce">
-          <p>¥{{ item.payPrice }}</p>
-          <p>库存{{ item.originalStock }}</p>
+          <p>¥{{ item.totalPrice }}</p>
         </div>
       </div>
       <div class="list">
         <ul>
-          <!-- <li>
-            <span>截止时间</span>
-            <span></span>
-          </li>-->
+          <li>
+            <span>购买数量</span>
+            <span>{{ item.buyAmount }}</span>
+          </li>
           <li>
             <span>单价</span>
             <span>{{ item.unitPrice }}</span>
-          </li>
-          <li>
-            <span>现有库存</span>
-            <span>{{ item.dynamicStock }}</span>
           </li>
           <li v-if="item.isSell == 0">
             <span>房间号</span>
@@ -50,47 +55,48 @@
           </li>
           <li>
             <span>支付金额</span>
-            <span>{{ item.payPrice }}</span>
-          </li>
-          <li>
-            <span>发布时间</span>
-            <span>{{ item.createTime }}</span>
+            <span>{{ item.totalPrice }}</span>
           </li>
           <li>
             <span>支付时间</span>
             <span>{{ item.payTime }}</span>
           </li>
-          <li>
-            <span>下架时间</span>
-            <span>{{ item.downShelfTime }}</span>
-          </li>
-          <li>
+          <!-- <li>
             <span>道具类别</span>
             <span>{{ item.releaseType == 1 ? '售卖' : '求购' }}</span>
-          </li>
+          </li> -->
           <li>
             <span>商品描述</span>
             <span>{{ item.propsDescribe }}</span>
           </li>
-          <li>
+          <!-- <li>
             <span>道具状态</span>
             <span>{{ item.releaseStatus == 1 ? '已上架' : item.releaseStatus == 0 ? '已下架' : item.releaseStatus == 2 ? '待付款' : item.releaseStatus == 3 ? '交易关闭' : item.releaseStatus == 4 ? '待审核' : item.releaseStatus == 5 ? '审核通过' : item.releaseStatus == 6 ? '审核失败' : '--' }}</span>
-          </li>
-          <li v-if="item.releaseStatus !=1 && item.releaseStatus !=0">
+          </li> -->
+          <!-- <li v-if="item.releaseStatus !=1 && item.releaseStatus !=0">
             <span>原因</span>
             <span>{{ item.closeName }}</span>
+          </li> -->
+          <li v-if="item.releaseType == 0 && item.orderStatus == 4">
+            <span>发货名</span>
+            <span>{{ item.sendGoodsName }}</span>
           </li>
-          <li v-if="item.releaseType == 1 && item.releaseStatus == 1">
+          <li v-if="releaseType == 1 && item.orderStatus == 3">
             <span>发货名</span>
             <span>
-              <van-field v-model="sendGoodsName" placeholder="陌陌账号或者名字" />
+              <!-- <van-field v-model="sendGoodsName" placeholder="陌陌账号或者名字" /> -->
+              <input class="name-text" type="text" v-model="sendGoodsName"  placeholder="请输入陌陌账号或者名字" >
             </span>
           </li>
-          <li v-if="item.releaseType == 1 && item.releaseStatus == 1">
+          <li v-if="releaseType == 1 && item.orderStatus == 3">
             <span>上传截图</span>
             <span></span>
           </li>
-          <van-uploader v-if="item.releaseType == 1 && item.releaseStatus == 1"  v-model="fileList" multiple />
+          <van-uploader
+            v-if="releaseType == 1 && item.orderStatus == 3"
+            v-model="fileList"
+            multiple
+          />
         </ul>
       </div>
       <div class="list-img" v-if="imgList.length">
@@ -99,10 +105,20 @@
       <div class="submit-btn" v-if="item.releaseStatus == 2">支付发布订单</div>
       <div
         class="submit-btn"
-        v-if="item.releaseStatus == 4 && item.releaseType != 1"
+        v-if="item.releaseType == 0 && item.orderStatus == 4 || item.orderStatus == 5"
         @click="submitReceive"
       >确认收货</div>
-      <div class="submit-btn" v-if="item.releaseType == 1 && item.releaseStatus == 1" @click="sendGoods()">去发货</div>
+            <div
+        class="submit-btn close-btn"
+        @click="appeal"
+        v-if="item.releaseType == 0 && item.orderStatus == 4"
+      >订单申诉</div>
+      <div
+        class="submit-btn"
+        v-if="releaseType == 1 && item.orderStatus == 3"
+        @click="sendGoods()"
+      >去发货</div>
+
     </div>
   </div>
 </template>
@@ -116,16 +132,59 @@ export default {
       item: {},
       imgList: [],
       fileList: [],
-      sendGoodsName: ""
+      sendGoodsName: "",
+      releaseId: null,
+      releaseType: null,
+      orderStatus: null,
+      active: 0
     };
   },
   methods: {
     backFun() {
-      this.$router.back(-2);
+      this.$router.push({
+        name: "ShopList",
+        params: {
+          releaseType: this.releaseType,
+          orderStatus: this.orderStatus,
+          titles: this.$route.params.titleText
+        }
+      });
     },
-    sendGoods(){
-      if(!this.sendGoodsName){
-        this.$toast.fail('请输入发货名');
+    // 确定申诉该订单
+    appeal() {
+      this.$dialog
+        .confirm({
+          title: "提示",
+          message: "确定申诉该订单？"
+        })
+        .then(() => {
+          this.axios
+            .post(`/propsOrder/appeal/${this.item.propsOrderId}`, {})
+            .then(res => {
+              if (res.data.returnCode == "SUCCESS") {
+                this.$toast.success("提交成功！工作人员会尽快处理");
+                setTimeout(() => {
+                  this.$router.push({
+                    name: "ShopList",
+                    params: {
+                      releaseType: this.releaseType,
+                      orderStatus: this.orderStatus,
+                      titles: this.$route.params.titleText
+                    }
+                  });
+                }, 1500);
+              } else {
+                this.$toast.fail(res.data.returnMsg);
+              }
+            });
+        })
+        .catch(() => {
+          // on cancel
+        });
+    },
+    sendGoods() {
+      if (!this.sendGoodsName) {
+        this.$toast.fail("请输入发货名");
         return false;
       }
       this.$dialog
@@ -135,15 +194,25 @@ export default {
         })
         .then(() => {
           this.axios
-            .post(`/propsOrder/sendGoods`,{
-              propsOrderId: this.item.releasePropsId,
+            .post(`/propsOrder/sendGoods`, {
+              propsOrderId: this.item.propsOrderId,
               openId: this.$store.state.openId,
-              imgUrl: this.fileList.join(','),
+              imgUrl: this.fileList.join(","),
               sendGoodsName: this.sendGoodsName
             })
             .then(res => {
               if (res.data.returnCode == "SUCCESS") {
-                this.$toast.success("下架成功");
+                this.$toast.success("操作成功");
+                setTimeout(() => {
+                  this.$router.push({
+                    name: "ShopList",
+                    params: {
+                      releaseType: this.releaseType,
+                      orderStatus: this.orderStatus,
+                      titles: this.$route.params.titleText
+                    }
+                  });
+                }, 1500);
               } else {
                 this.$toast.fail(res.data.returnMsg);
               }
@@ -162,10 +231,20 @@ export default {
         })
         .then(() => {
           this.axios
-            .post(`/release/dismount/${this.item.releasePropsId}`)
+            .post(`/release/dismount/${this.item.propsOrderId}`)
             .then(res => {
               if (res.data.returnCode == "SUCCESS") {
                 this.$toast.success("下架成功");
+                setTimeout(() => {
+                  this.$router.push({
+                    name: "ShopList",
+                    params: {
+                      releaseType: this.releaseType,
+                      orderStatus: this.orderStatus,
+                      titles: this.$route.params.titleText
+                    }
+                  });
+                }, 1500);
               } else {
                 this.$toast.fail(res.data.returnMsg);
               }
@@ -183,10 +262,20 @@ export default {
         })
         .then(() => {
           this.axios
-            .post(`/propsOrder/confirmGoods/${this.item.releasePropsId}`)
+            .post(`/propsOrder/confirmGoods/${this.item.propsOrderId}`)
             .then(res => {
               if (res.data.returnCode == "SUCCESS") {
                 this.$toast.success("操作成功");
+                setTimeout(() => {
+                  this.$router.push({
+                    name: "ShopList",
+                    params: {
+                      releaseType: this.releaseType,
+                      orderStatus: this.orderStatus,
+                      titles: this.$route.params.titleText
+                    }
+                  });
+                }, 1500);
               } else {
                 this.$toast.fail(res.data.returnMsg);
               }
@@ -198,16 +287,22 @@ export default {
     }
   },
   mounted() {
+    this.releaseType = this.$route.params.releaseType;
+    this.orderStatus = this.$route.params.orderStatus;
     const releaseId = this.$route.params.releaseId;
-
-    this.axios.post(`/user/releaseInfoById/${releaseId}`).then(res => {
+    this.releaseId = releaseId;
+    this.axios.post(`/user/orderInfoById`,{
+      orderId: this.releaseId,
+      releaseType: this.releaseType
+    }).then(res => {
       if (res.data.returnCode == "SUCCESS") {
         this.item = res.data.result;
         this.imgList = res.data.result.releaseImg
           ? res.data.result.releaseImg.split(",")
           : [];
+        this.active = this.item.orderStatus == 1 ? 0 : (this.item.orderStatus == 2 || this.item.orderStatus == 3) ? 1 :  (this.item.orderStatus == 4 || this.item.orderStatus == 5) ? 2 : this.item.orderStatus == 6  ? 3 : 2 
       }
-    });
+    }); 
   }
 };
 </script>
@@ -215,6 +310,12 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .detail {
+  .name-text{
+    font-size: 15px;
+    text-align: right;
+    border: none;
+    outline: none;
+  }
   .list-img.list-img {
     width: 100%;
     overflow: hidden;

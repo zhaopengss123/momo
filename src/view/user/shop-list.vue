@@ -8,11 +8,11 @@
           <img :src="item.propsImgUlr" />
           <div class="list-text">
             <p>
-              {{ item.titleDescribe }}
+              {{ item.propsName }}
               <span v-if="item.releaseType == 1">售卖</span>
               <i v-if="item.releaseType == 0">求购</i>
             </p>
-            <p></p>
+            <p>{{ item.titleDescribe }}</p>
             <p>状态：{{ item.orderStatus == 1 ? '待付款' : item.orderStatus == 2 ? '已付款' : item.orderStatus == 3 ? '待发货' : item.orderStatus == 4 ? '已发货' : item.orderStatus == 5 ? '待确认' : item.orderStatus == 6 ? '交易成功' : item.orderStatus == 7 ? '交易关闭' :item.orderStatus == 8 ? '申诉中' :item.orderStatus == 9 ? '申诉成功' :item.orderStatus == 10 ? '申述失败' : '--' }}</p>
           </div>
           <div class="right-pirce">
@@ -37,13 +37,13 @@ export default {
   },
   methods: {
     backFun() {
-      this.$router.back(-1);
+      this.$router.push({ path: '/user'  });
     },
     getDList() {
       this.axios
         .post(`/user/orderInfo`, {
           openId: this.$store.state.openId,
-          releaseType: this.releaseType || null,
+          releaseType: this.releaseType,
           orderStatus: this.orderStatus,
           pageNo: 1,
           pageSize: 10000
@@ -58,7 +58,7 @@ export default {
         });
     },
     toDetail(releaseId) {
-      this.$router.push({ name: "Buydetail", params: { releaseId } });
+      this.$router.push({ name: "Buydetail", params: { releaseId, releaseType: this.releaseType,orderStatus:this.orderStatus, titleText: this.titleText } });
     }
   },
   mounted() {

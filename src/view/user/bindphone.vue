@@ -15,6 +15,7 @@
         type="number"
         name="验证码"
         label="验证码"
+        maxlength="6"
         placeholder="验证码"
         :rules="[{ required: true, message: '请填写验证码' }]"
       >

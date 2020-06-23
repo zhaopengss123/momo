@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    <van-nav-bar title="momo道具城" />
+    <van-nav-bar title="陌陌道具城" />
     <div class="header">
       <img :src="userInfo.userHeadImgUrl" alt />
       <div>
@@ -32,32 +32,32 @@
         <div class="card-title">我的购买</div>
         <div class="card-main">
           <ul>
-            <li :class="buyNumberFun(1) ? 'active' : ''">
+                 <li :class="buyNumberFun(1) ? 'active' : ''">
               <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 1, titles: '待支付' } }">
                 <span>待支付</span>
               </router-link>
               <i></i>
             </li>
             <li :class="buyNumberFun(3) ? 'active' : ''">
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 2, titles: '待发货' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 3, titles: '待发货' } }">
               <span>待发货</span>
              </router-link>
              <i></i>
             </li>
             <li :class="buyNumberFun(5) ? 'active' : ''">
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 3, titles: '待审核' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 5, titles: '待审核' } }">
               <span>待审核</span>
              </router-link>
              <i></i>
             </li>
             <li :class="buyNumberFun(8) ? 'active' : ''">
-             <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 5, titles: '审核中' } }">
+             <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 8, titles: '审核中' } }">
               <span>申诉中</span>
             </router-link>
             <i></i>
             </li>
             <li>
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 4, titles: '交易成功' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 6, titles: '交易成功' } }">
               <span>交易成功</span>
             </router-link>
             <i></i>
@@ -83,25 +83,25 @@
               <i></i>
             </li>
             <li :class="sellNumberFun(3) ? 'active' : ''">
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 2, titles: '待发货' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 3, titles: '待发货' } }">
               <span>待发货</span>
              </router-link>
              <i></i>
             </li>
             <li :class="sellNumberFun(5) ? 'active' : ''">
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 3, titles: '待审核' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 5, titles: '待审核' } }">
               <span>待审核</span>
              </router-link>
              <i></i>
             </li>
             <li :class="sellNumberFun(8) ? 'active' : ''">
-             <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 5, titles: '审核中' } }">
+             <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 8, titles: '审核中' } }">
               <span>申诉中</span>
             </router-link>
             <i></i>
             </li>
             <li>
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 4, titles: '交易成功' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 6, titles: '交易成功' } }">
               <span>交易成功</span>
             </router-link>
             <i></i>
@@ -142,9 +142,6 @@ export default {
   components: { footerComponent },
   methods: {},
   mounted() {
-    if (this.$store.state.userInfo.userOpenId) {
-      this.userInfo = this.$store.state.userInfo;
-    } else {
       this.axios.post(`/user/info/${this.$store.state.openId}`).then(res => {
         if (res.data.returnCode == "SUCCESS") {
           this.$store.commit("setUserInfo", res.data.result);
@@ -161,9 +158,6 @@ export default {
             this.buyNumber = res.data.result;
         }
       });
-
-
-    }
   },
   computed:{
     buyNumberFun(){
@@ -204,7 +198,7 @@ export default {
     margin-bottom: 30px;
     a {
       color: inherit;
-      display: block;
+      display: inline-block;
       width: 100%;
       height: 100%;
     }
@@ -218,7 +212,9 @@ export default {
       float: left;
       margin-left: 10px;
       .header-top{
+        line-height: 25px;
        span {
+         float:left;
         &:nth-child(1) {
           color: #373c41;
           font-size: 16px;
@@ -235,6 +231,10 @@ export default {
       .header-bottom{
         display:block;
         clear:both;
+        line-height: 25px;
+        span{
+          float:left;
+        }
         span:nth-child(1){
           color:#E53B33;
           font-size: 16px;
