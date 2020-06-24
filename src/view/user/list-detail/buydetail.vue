@@ -23,6 +23,9 @@
       <div class="list">
         <ul>
           <li>
+            <p>订单详情</p>
+          </li>
+          <li>
             <span>购买数量</span>
             <span>{{ item.buyAmount }}</span>
           </li>
@@ -58,10 +61,7 @@
             <span>支付时间</span>
             <span>{{ item.payTime }}</span>
           </li>
-          <!-- <li>
-            <span>道具类别</span>
-            <span>{{ item.releaseType == 1 ? '售卖' : '求购' }}</span>
-          </li> -->
+
           <li>
             <span>商品描述</span>
             <span>{{ item.propsDescribe }}</span>
@@ -375,20 +375,23 @@ export default {
       margin-top: 14px;
       li {
         width: 100%;
-        height: 47px;
-        line-height: 47px;
+        height: 40px;
+        line-height: 40px;
+        p{
+          color: #101010;
+          font-size: 16px;
+          font-weight: bold;
+        }
         span {
           float: left;
-          font-size: 16px;
+          font-size: 14px;
+          color: #9B9B9B;
           &:nth-child(2) {
             float: right;
+            color: #101010;
             text-align: right !important;
-            .van-field__control {
-              text-align: right;
-            }
           }
           &:nth-child(1) {
-            font-weight: bold;
           }
         }
       }
