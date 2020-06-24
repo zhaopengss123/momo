@@ -9,9 +9,6 @@
       <van-step>待审核</van-step>
       <van-step>交易成功</van-step>
     </van-steps>
-
-      
-
       <div class="header">
         <img :src="item.propsImgUlr" />
         <div class="list-text">
@@ -69,22 +66,14 @@
             <span>商品描述</span>
             <span>{{ item.propsDescribe }}</span>
           </li>
-          <!-- <li>
-            <span>道具状态</span>
-            <span>{{ item.releaseStatus == 1 ? '已上架' : item.releaseStatus == 0 ? '已下架' : item.releaseStatus == 2 ? '待付款' : item.releaseStatus == 3 ? '交易关闭' : item.releaseStatus == 4 ? '待审核' : item.releaseStatus == 5 ? '审核通过' : item.releaseStatus == 6 ? '审核失败' : '--' }}</span>
-          </li> -->
-          <!-- <li v-if="item.releaseStatus !=1 && item.releaseStatus !=0">
-            <span>原因</span>
-            <span>{{ item.closeName }}</span>
-          </li> -->
-          <li v-if="item.releaseType == 0 && item.orderStatus == 4">
+
+          <li v-if="item.releaseType == 0 && item.orderStatus == 4 || item.orderStatus == 5">
             <span>发货名</span>
             <span>{{ item.sendGoodsName }}</span>
           </li>
           <li v-if="releaseType == 1 && item.orderStatus == 3">
             <span>发货名</span>
             <span>
-              <!-- <van-field v-model="sendGoodsName" placeholder="陌陌账号或者名字" /> -->
               <input class="name-text" type="text" v-model="sendGoodsName"  placeholder="请输入陌陌账号或者名字" >
             </span>
           </li>
