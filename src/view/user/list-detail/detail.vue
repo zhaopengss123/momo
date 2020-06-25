@@ -10,7 +10,7 @@
           <p v-if="item.createTime">{{ item.createTime }} · 平台上传</p>
         </div>
         <div class="right-pirce">
-          <p>¥{{ item.payPrice }}</p>
+          <p>¥{{ item.unitPrice }}</p>
           <p>库存{{ item.originalStock }}</p>
         </div>
       </div>
@@ -24,16 +24,20 @@
             <span>{{ item.releaseType == 1 ? '售卖' : '求购' }}</span>
           </li>
           <li>
-            <span>订单号</span>
-            <span>{{ item.orderNo }}</span>
-          </li>
-          <li>
             <span>发布时间</span>
             <span>{{ item.createTime }}</span>
           </li>
           <li>
-            <span>支付时间</span>
-            <span>{{ item.payTime }}</span>
+            <span>订单号</span>
+            <span>{{ item.orderNo }}</span>
+          </li>
+          <li>
+            <span>配送方式</span>
+            <span>{{ item.deliveryTypeName }}</span>
+          </li>
+          <li>
+            <span>商品描述</span>
+            <span>{{ item.propsDescribe }}</span>
           </li>
           <li v-if="item.downShelfTime">
             <span>下架时间</span>
@@ -43,8 +47,8 @@
             <i></i>
           </li>
           <li>
-            <span>配送方式</span>
-            <span>{{ item.deliveryTypeName }}</span>
+            <span>剩余库存</span>
+            <span>{{ item.dynamicStock }}</span>
           </li>
           <li class="line">
             <i></i>
@@ -53,13 +57,22 @@
             <span>单价</span>
             <span>{{ item.unitPrice }}</span>
           </li>
+          <li v-if="item.releaseType == 1">
+            <span>保证金</span>
+            <span>{{ item.cashDeposit }}</span>
+          </li>
+
           <li>
-            <span>现有库存</span>
-            <span>{{ item.dynamicStock }}</span>
+            <span>总金额</span>
+            <span>{{ item.totalPrice }}</span>
           </li>
           <li>
             <span>支付金额</span>
             <span>{{ item.payPrice }}</span>
+          </li>
+          <li>
+            <span>支付时间</span>
+            <span>{{ item.payTime }}</span>
           </li>
           <li v-if="item.isSell == 0">
             <span>房间号</span>
@@ -74,13 +87,9 @@
             <span>{{ item.anchorName }}</span>
           </li>
 
-          <li>
-            <span>商品描述</span>
-            <span>{{ item.propsDescribe }}</span>
-          </li>
-          <li>
+          <li v-if="item.releaseStatus == 0">
             <span>道具状态</span>
-            <span>{{ item.releaseStatus == 1 ? '已上架' : item.releaseStatus == 0 ? '已下架' : item.releaseStatus == 2 ? '待付款' : item.releaseStatus == 3 ? '交易关闭' : item.releaseStatus == 4 ? '待审核' : item.releaseStatus == 5 ? '审核通过' : item.releaseStatus == 6 ? '审核失败' : '--' }}</span>
+            <span>已下架</span>
           </li>
           <li v-if="item.releaseStatus !=1 && item.releaseStatus !=0">
             <span>原因</span>
@@ -330,7 +339,8 @@ export default {
     border-radius: 27px;
     margin-top: 15px;
     &.close-btn {
-      background: #ccc;
+      background: #dbdbdf;
+      color: #9096a9;
     }
   }
 }

@@ -17,9 +17,9 @@
         <div class="card-main">
           <ul>
             <li>
-              <router-link to="/releaseInfo">
+              <router-link to="/releaseInfo"></router-link>
               <span>我的发布</span>
-              </router-link>
+              
             </li>
             <!-- <li class="last">
               <span>已下架</span>
@@ -33,39 +33,39 @@
         <div class="card-main">
           <ul>
                  <li :class="buyNumberFun(1) ? 'active' : ''">
-              <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 1, titles: '待支付' } }">
+              <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 1, titles: '待支付' } }"></router-link>
                 <span>待支付</span>
-              </router-link>
+              
               <i></i>
             </li>
             <li :class="buyNumberFun(3) ? 'active' : ''">
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 3, titles: '待发货' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 3, titles: '待发货' } }"></router-link>
               <span>待发货</span>
-             </router-link>
+             
              <i></i>
             </li>
             <li :class="buyNumberFun(5) ? 'active' : ''">
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 5, titles: '待审核' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 5, titles: '待审核' } }"></router-link>
               <span>待审核</span>
-             </router-link>
+             
              <i></i>
             </li>
             <li :class="buyNumberFun(8) ? 'active' : ''">
-             <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 8, titles: '审核中' } }">
+             <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 8, titles: '审核中' } }"></router-link>
               <span>申诉中</span>
-            </router-link>
+            
             <i></i>
             </li>
             <li>
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 6, titles: '交易成功' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 0, orderStatus: 6, titles: '交易成功' } }"></router-link>
               <span>交易成功</span>
-            </router-link>
+            
             <i></i>
             </li>
             <li>
-             <router-link :to="{ name: 'ShopList',params:{  releaseType: 0, titles: '全部订单' } }">
+             <router-link :to="{ name: 'ShopList',params:{  releaseType: 0, titles: '全部订单' } }"></router-link>
               <span>全部订单</span>
-              </router-link>
+              
               <i></i>
             </li>
           </ul>
@@ -77,39 +77,39 @@
         <div class="card-main">
           <ul>
             <li :class="sellNumberFun(1) ? 'active' : ''">
-              <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 1, titles: '待支付' } }">
+              <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 1, titles: '待支付' } }"></router-link>
                 <span>待支付</span>
-              </router-link>
+              
               <i></i>
             </li>
             <li :class="sellNumberFun(3) ? 'active' : ''">
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 3, titles: '待发货' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 3, titles: '待发货' } }"></router-link>
               <span>待发货</span>
-             </router-link>
+             
              <i></i>
             </li>
             <li :class="sellNumberFun(5) ? 'active' : ''">
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 5, titles: '待审核' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 5, titles: '待审核' } }"></router-link>
               <span>待审核</span>
-             </router-link>
+             
              <i></i>
             </li>
             <li :class="sellNumberFun(8) ? 'active' : ''">
-             <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 8, titles: '审核中' } }">
+             <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 8, titles: '审核中' } }"></router-link>
               <span>申诉中</span>
-            </router-link>
+            
             <i></i>
             </li>
             <li>
-            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 6, titles: '交易成功' } }">
+            <router-link :to="{ name: 'ShopList',params:{ releaseType: 1, orderStatus: 6, titles: '交易成功' } }"></router-link>
               <span>交易成功</span>
-            </router-link>
+            
             <i></i>
             </li>
             <li>
-             <router-link :to="{ name: 'ShopList',params:{  releaseType: 1, titles: '全部订单' } }">
+             <router-link :to="{ name: 'ShopList',params:{  releaseType: 1, titles: '全部订单' } }"></router-link>
               <span>全部订单</span>
-              </router-link>
+              
               <i></i>
             </li>
           </ul>
@@ -288,6 +288,9 @@ export default {
         width: 100%;
         height: 100%;
         color: inherit;
+        position: absolute;
+        top: 0;
+        left: 0;
       }
       &.active{
               i{

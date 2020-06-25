@@ -33,6 +33,32 @@
             <span>支付时间</span>
             <span>{{ item.payTime }}</span>
           </li>
+          <li v-if="releaseType == 0 && item.orderStatus == 1">
+            <span>支付剩余时间</span>
+            <span>
+              <b>{{ countDown.d }}</b>
+              <b>天</b>
+              <b>{{ countDown.h }}</b>
+              <b>时</b>
+              <b>{{ countDown.m }}</b>
+              <b>分</b>
+              <b>{{ countDown.s }}</b>
+              <b>秒</b>
+            </span>
+          </li>
+          <li v-if="releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)">
+            <span>自动确认收货时间</span>
+            <span>
+              <b>{{ countDown.d }}</b>
+              <b>天</b>
+              <b>{{ countDown.h }}</b>
+              <b>时</b>
+              <b>{{ countDown.m }}</b>
+              <b>分</b>
+              <b>{{ countDown.s }}</b>
+              <b>秒</b>
+            </span>
+          </li>
           <li class="line">
             <i></i>
           </li>
@@ -40,7 +66,7 @@
             <span>配送方式</span>
             <span>{{ item.deliveryTypeName }}</span>
           </li>
-          <li v-if="item.releaseType == 0 && item.orderStatus == 4 || item.orderStatus == 5">
+          <li v-if="releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)">
             <span>发货名</span>
             <span>{{ item.sendGoodsName }}</span>
           </li>
@@ -56,8 +82,12 @@
             <span>{{ item.buyAmount }}</span>
           </li>
           <li>
-            <span>支付金额</span>
+            <span>总金额</span>
             <span>{{ item.totalPrice }}</span>
+          </li>
+          <li>
+            <span>支付金额</span>
+            <span>{{ item.payPrice }}</span>
           </li>
           <li v-if="item.isSell == 0">
             <span>房间号</span>
@@ -105,16 +135,16 @@
       <div class="list-img" v-if="imgList.length">
         <img v-for="(item,index) in imgList" :key="index" :src="item" />
       </div>
-      <div class="submit-btn" @click="subPay" v-if="item.releaseType == 0 && item.orderStatus == 1">去支付</div>
+      <div class="submit-btn" @click="subPay" v-if="releaseType == 0 && item.orderStatus == 1">去支付</div>
       <div
         class="submit-btn"
-        v-if="item.releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)"
+        v-if="releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)"
         @click="submitReceive"
       >确认收货</div>
       <div
         class="submit-btn close-btn"
         @click="appeal"
-         v-if="item.releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)"
+        v-if="releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)"
       >订单申诉</div>
       <div
         class="submit-btn"
@@ -138,7 +168,8 @@ export default {
       releaseId: null,
       releaseType: null,
       orderStatus: null,
-      active: 0
+      active: 0,
+      countDown: {}
     };
   },
   methods: {
@@ -183,6 +214,21 @@ export default {
         .catch(() => {
           // on cancel
         });
+    },
+    getCountDown(endTime) {
+      var surplus = parseInt((endTime - new Date().getTime()) / 1000);
+      var d = Math.floor(surplus / (24 * 60 * 60)),
+        h = Math.floor((surplus / (60 * 60)) % 24),
+        m = Math.floor((surplus / 60) % 60),
+        s = surplus % 60;
+      let countDown = {
+        d: d >= 0 ? d : 0,
+        h: h >= 0 ? h : 0,
+        m: m >= 0 ? m : 0,
+        s: s >= 0 ? s : 0
+      };
+      this.countDown = countDown;
+      s >= 0 && setTimeout(this.getCountDown, 1000, endTime);
     },
     sendGoods() {
       if (!this.sendGoodsName) {
@@ -333,6 +379,22 @@ export default {
           this.imgList = res.data.result.sendGoodsImg
             ? res.data.result.sendGoodsImg.split(",")
             : [];
+          if (
+            this.releaseType == 0 &&
+            this.item.orderStatus == 1 &&
+            this.item.payTimeOut
+          ) {
+            let payTimeOut = new Date(this.item.payTimeOut).getTime();
+            this.getCountDown(payTimeOut);
+          }
+
+          if (
+           this.releaseType == 0 && (this.item.orderStatus == 4 || this.item.orderStatus == 5) && this.item.confirmTimeOut
+          ) {
+            let confirmTimeOut = new Date(this.item.confirmTimeOut).getTime();
+            this.getCountDown(confirmTimeOut);
+          }
+
           this.active =
             this.item.orderStatus == 1
               ? 0
@@ -440,6 +502,9 @@ export default {
           height: 1px;
           background: #eee;
           margin-top: 9px;
+        }
+        b {
+          font-weight: normal;
         }
         p {
           color: #101010;

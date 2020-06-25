@@ -29,7 +29,7 @@
               <i v-if="item.releaseType == 0">求购</i>
             </p>
              <p>{{ item.titleDescribe }}</p>
-            <p v-if="item.createTime">{{ item.createTime }} · 平台上传</p>
+            <p v-if="item.createTime">{{ item.createTime }}</p>
           </div>
           <div class="right-pirce">
             <p>¥{{ item.unitPrice }}</p>

@@ -10,8 +10,8 @@ export default () => {
   return new Vuex.Store({
     state:{
      // openId: 'osHzdt5mqVBHOA5gN_hO8TY1GZP8',//赵鹏
-       openId: 'osHzdt1sHyCDADec5l6crHUgWsZM', //李阳
-      //openId: 'osHzdt1S0IebegxuWAVw44PnABvs', //董继
+       // openId: 'osHzdt1sHyCDADec5l6crHUgWsZM', //李阳
+     openId: 'osHzdt1S0IebegxuWAVw44PnABvs', //董继
 
       phone: false,
       userInfo:{}
