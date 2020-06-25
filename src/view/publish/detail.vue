@@ -87,7 +87,6 @@
           name="主播姓名"
           label="主播姓名"
           placeholder="主播姓名"
-          :rules="[{ required: true, message: '请填写主播姓名' }]"
         />
         <van-field
           readonly

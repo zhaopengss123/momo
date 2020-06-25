@@ -16,41 +16,16 @@
       </div>
       <div class="list">
         <ul>
-          <!-- <li>
-            <span>截止时间</span>
-            <span></span>
-          </li>-->
           <li>
-            <span>单价</span>
-            <span>{{ item.unitPrice }}</span>
+            <p>订单详情</p>
           </li>
           <li>
-            <span>现有库存</span>
-            <span>{{ item.dynamicStock }}</span>
-          </li>
-          <li v-if="item.isSell == 0">
-            <span>房间号</span>
-            <span>{{ item.roomNumber }}</span>
-          </li>
-          <li v-if="item.isSell == 0">
-            <span>主播名</span>
-            <span>{{ item.guestsName }}</span>
-          </li>
-          <li v-if="item.isSell == 0">
-            <span>嘉宾</span>
-            <span>{{ item.anchorName }}</span>
-          </li>
-          <li>
-            <span>配送方式</span>
-            <span>{{ item.deliveryTypeName }}</span>
+            <span>道具类别</span>
+            <span>{{ item.releaseType == 1 ? '售卖' : '求购' }}</span>
           </li>
           <li>
             <span>订单号</span>
             <span>{{ item.orderNo }}</span>
-          </li>
-          <li>
-            <span>支付金额</span>
-            <span>{{ item.payPrice }}</span>
           </li>
           <li>
             <span>发布时间</span>
@@ -64,10 +39,41 @@
             <span>下架时间</span>
             <span>{{ item.downShelfTime }}</span>
           </li>
-          <li>
-            <span>道具类别</span>
-            <span>{{ item.releaseType == 1 ? '售卖' : '求购' }}</span>
+          <li class="line">
+            <i></i>
           </li>
+          <li>
+            <span>配送方式</span>
+            <span>{{ item.deliveryTypeName }}</span>
+          </li>
+          <li class="line">
+            <i></i>
+          </li>
+          <li>
+            <span>单价</span>
+            <span>{{ item.unitPrice }}</span>
+          </li>
+          <li>
+            <span>现有库存</span>
+            <span>{{ item.dynamicStock }}</span>
+          </li>
+          <li>
+            <span>支付金额</span>
+            <span>{{ item.payPrice }}</span>
+          </li>
+          <li v-if="item.isSell == 0">
+            <span>房间号</span>
+            <span>{{ item.roomNumber }}</span>
+          </li>
+          <li v-if="item.isSell == 0">
+            <span>主播名</span>
+            <span>{{ item.guestsName }}</span>
+          </li>
+          <li v-if="item.isSell == 0">
+            <span>嘉宾</span>
+            <span>{{ item.anchorName }}</span>
+          </li>
+
           <li>
             <span>商品描述</span>
             <span>{{ item.propsDescribe }}</span>
@@ -85,7 +91,6 @@
 
       <div class="submit-btn" v-if="item.releaseStatus == 2">支付发布订单</div>
       <div class="submit-btn close-btn" @click="dismount" v-if="item.releaseStatus == 1 ">下架道具</div>
-
     </div>
   </div>
 </template>
@@ -276,20 +281,34 @@ export default {
       margin-top: 14px;
       li {
         width: 100%;
-        height: 47px;
-        line-height: 47px;
+        height: 40px;
+        line-height: 40px;
+        overflow: hidden;
+        &.line {
+          height: 20px;
+        }
+        i {
+          display: block;
+          width: 100%;
+          height: 1px;
+          background: #eee;
+          margin-top: 9px;
+        }
+        p {
+          color: #101010;
+          font-size: 16px;
+          font-weight: bold;
+        }
         span {
           float: left;
-          font-size: 16px;
+          font-size: 14px;
+          color: #9b9b9b;
           &:nth-child(2) {
             float: right;
+            color: #101010;
             text-align: right !important;
-            .van-field__control {
-              text-align: right;
-            }
           }
           &:nth-child(1) {
-            font-weight: bold;
           }
         }
       }

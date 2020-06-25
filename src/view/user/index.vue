@@ -116,11 +116,9 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title">联系客服</div>
+        <div class="card-title" >联系客服</div>
       </div>
-      <div class="card">
-        <div class="card-title">订单申诉</div>
-      </div>
+
     </div>
     <footer-component :activeIndex="2"></footer-component>
   </div>

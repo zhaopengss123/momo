@@ -60,7 +60,6 @@
           name="主播姓名"
           label="主播姓名"
           placeholder="主播姓名"
-          :rules="[{ required: true, message: '请填写主播姓名' }]"
         />
         <van-field
           readonly
@@ -107,6 +106,7 @@
           :rules="[{ required: true, message: '请填写数量' }]"
         />
           <van-field
+          v-if="selectClass.customerImg && selectClass.customerImg == 1"
           name="form1.imgUrl"
           label="道具图片"
           :rules="[{ required: true, message: '请填写道具图片' }]"
@@ -120,7 +120,6 @@
           name="道具描述"
           label="道具描述"
           placeholder="道具描述"
-          :rules="[{ required: true, message: '请填写道具描述' }]"
         />
         <div style="margin: 16px;">
           <van-button
@@ -170,13 +169,25 @@
           placeholder="数量"
           :rules="[{ required: true, message: '请填写数量' }]"
         />
+
+          <van-field
+          v-if="selectClass.customerImg && selectClass.customerImg == 1"
+          name="form1.imgUrl"
+          label="道具图片"
+          :rules="[{ required: true, message: '请填写道具图片' }]"
+        >
+          <template #input>
+            <van-uploader v-model="customerImg" :max-count="1" :after-read="afterRead" />
+          </template>
+        </van-field> 
+
         <van-field
           v-model="form2.describe"
           name="道具描述"
           label="道具描述"
           placeholder="道具描述"
-          :rules="[{ required: true, message: '请填写道具描述' }]"
         />
+ 
         <div style="margin: 16px;">
           <van-button
             class="sbtn"
@@ -369,6 +380,11 @@ export default {
               function(res) {
                 if (res.err_msg == "get_brand_wcpay_request:ok") {
                     that.$router.push({ path: '/index' });
+                }else{
+                  this.$dialog({ message: '支付失败！' });
+                  setTimeout(()=>{
+                    that.$router.push({ path: '/index' });
+                  },1500)
                 }
               }
             );

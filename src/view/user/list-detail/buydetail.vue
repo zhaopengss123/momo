@@ -3,12 +3,12 @@
     <van-nav-bar title="道具详情" left-arrow @click-left="backFun" />
 
     <div>
-    <van-steps :active="active" active-color="#e0305b">
-      <van-step>待支付</van-step>
-      <van-step>代发货</van-step>
-      <van-step>待审核</van-step>
-      <van-step>交易成功</van-step>
-    </van-steps>
+      <van-steps v-if="active != -10" :active="active" active-color="#e0305b">
+        <van-step>待支付</van-step>
+        <van-step>代发货</van-step>
+        <van-step>待审核</van-step>
+        <van-step>交易成功</van-step>
+      </van-steps>
       <div class="header">
         <img :src="item.propsImgUlr" />
         <div class="list-text">
@@ -26,12 +26,38 @@
             <p>订单详情</p>
           </li>
           <li>
-            <span>购买数量</span>
-            <span>{{ item.buyAmount }}</span>
+            <span>订单号</span>
+            <span>{{ item.orderNo }}</span>
+          </li>
+          <li>
+            <span>支付时间</span>
+            <span>{{ item.payTime }}</span>
+          </li>
+          <li class="line">
+            <i></i>
+          </li>
+          <li>
+            <span>配送方式</span>
+            <span>{{ item.deliveryTypeName }}</span>
+          </li>
+          <li v-if="item.releaseType == 0 && item.orderStatus == 4 || item.orderStatus == 5">
+            <span>发货名</span>
+            <span>{{ item.sendGoodsName }}</span>
+          </li>
+          <li class="line">
+            <i></i>
           </li>
           <li>
             <span>单价</span>
             <span>{{ item.unitPrice }}</span>
+          </li>
+          <li>
+            <span>购买数量</span>
+            <span>{{ item.buyAmount }}</span>
+          </li>
+          <li>
+            <span>支付金额</span>
+            <span>{{ item.totalPrice }}</span>
           </li>
           <li v-if="item.isSell == 0">
             <span>房间号</span>
@@ -46,35 +72,19 @@
             <span>{{ item.anchorName }}</span>
           </li>
           <li>
-            <span>配送方式</span>
-            <span>{{ item.deliveryTypeName }}</span>
-          </li>
-          <li>
-            <span>订单号</span>
-            <span>{{ item.orderNo }}</span>
-          </li>
-          <li>
-            <span>支付金额</span>
-            <span>{{ item.totalPrice }}</span>
-          </li>
-          <li>
-            <span>支付时间</span>
-            <span>{{ item.payTime }}</span>
-          </li>
-
-          <li>
             <span>商品描述</span>
             <span>{{ item.propsDescribe }}</span>
           </li>
 
-          <li v-if="item.releaseType == 0 && item.orderStatus == 4 || item.orderStatus == 5">
-            <span>发货名</span>
-            <span>{{ item.sendGoodsName }}</span>
-          </li>
           <li v-if="releaseType == 1 && item.orderStatus == 3">
             <span>发货名</span>
             <span>
-              <input class="name-text" type="text" v-model="sendGoodsName"  placeholder="请输入陌陌账号或者名字" >
+              <input
+                class="name-text"
+                type="text"
+                v-model="sendGoodsName"
+                placeholder="请输入陌陌账号或者名字"
+              />
             </span>
           </li>
           <li v-if="releaseType == 1 && item.orderStatus == 3">
@@ -86,28 +96,31 @@
             v-model="fileList"
             multiple
           />
+          <li v-if="imgList.length">
+            <span>发货截图</span>
+            <span></span>
+          </li>
         </ul>
       </div>
       <div class="list-img" v-if="imgList.length">
         <img v-for="(item,index) in imgList" :key="index" :src="item" />
       </div>
-      <div class="submit-btn" v-if="item.releaseStatus == 2">支付发布订单</div>
+      <div class="submit-btn" @click="subPay" v-if="item.releaseType == 0 && item.orderStatus == 1">去支付</div>
       <div
         class="submit-btn"
-        v-if="item.releaseType == 0 && item.orderStatus == 4 || item.orderStatus == 5"
+        v-if="item.releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)"
         @click="submitReceive"
       >确认收货</div>
-            <div
+      <div
         class="submit-btn close-btn"
         @click="appeal"
-        v-if="item.releaseType == 0 && item.orderStatus == 4"
+         v-if="item.releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)"
       >订单申诉</div>
       <div
         class="submit-btn"
         v-if="releaseType == 1 && item.orderStatus == 3"
         @click="sendGoods()"
       >去发货</div>
-
     </div>
   </div>
 </template>
@@ -243,6 +256,35 @@ export default {
           // on cancel
         });
     },
+
+    subPay() {
+      const that = this;
+      this.axios
+        .post(`/propsOrder/goPay/${this.item.propsOrderId}`)
+        .then(res => {
+          if (res.data.returnCode == "SUCCESS") {
+            WeixinJSBridge.invoke(
+              "getBrandWCPayRequest",
+              {
+                appId: res.data.result.appId, //公众号名称，由商户传入
+                timeStamp: "" + res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                nonceStr: res.data.result.nonceStr, //随机串
+                package: res.data.result.packages,
+                signType: res.data.result.signType, //微信签名方式：
+                paySign: res.data.result.paySign //微信签名
+              },
+              function(res) {
+                if (res.err_msg == "get_brand_wcpay_request:ok") {
+                  that.$router.push({ path: "/user" });
+                }
+              }
+            );
+          } else {
+            this.$toast.fail(res.data.returnMsg);
+          }
+        });
+    },
+
     submitReceive() {
       this.$dialog
         .confirm({
@@ -280,18 +322,29 @@ export default {
     this.orderStatus = this.$route.params.orderStatus;
     const releaseId = this.$route.params.releaseId;
     this.releaseId = releaseId;
-    this.axios.post(`/user/orderInfoById`,{
-      orderId: this.releaseId,
-      releaseType: this.releaseType
-    }).then(res => {
-      if (res.data.returnCode == "SUCCESS") {
-        this.item = res.data.result;
-        this.imgList = res.data.result.releaseImg
-          ? res.data.result.releaseImg.split(",")
-          : [];
-        this.active = this.item.orderStatus == 1 ? 0 : (this.item.orderStatus == 2 || this.item.orderStatus == 3) ? 1 :  (this.item.orderStatus == 4 || this.item.orderStatus == 5) ? 2 : this.item.orderStatus == 6  ? 3 : 2 
-      }
-    }); 
+    this.axios
+      .post(`/user/orderInfoById`, {
+        orderId: this.releaseId,
+        releaseType: this.releaseType
+      })
+      .then(res => {
+        if (res.data.returnCode == "SUCCESS") {
+          this.item = res.data.result;
+          this.imgList = res.data.result.sendGoodsImg
+            ? res.data.result.sendGoodsImg.split(",")
+            : [];
+          this.active =
+            this.item.orderStatus == 1
+              ? 0
+              : this.item.orderStatus == 2 || this.item.orderStatus == 3
+              ? 1
+              : this.item.orderStatus == 4 || this.item.orderStatus == 5
+              ? 2
+              : this.item.orderStatus == 6
+              ? 3
+              : -1;
+        }
+      });
   }
 };
 </script>
@@ -299,7 +352,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .detail {
-  .name-text{
+  .name-text {
     font-size: 15px;
     text-align: right;
     border: none;
@@ -377,7 +430,18 @@ export default {
         width: 100%;
         height: 40px;
         line-height: 40px;
-        p{
+        overflow: hidden;
+        &.line {
+          height: 20px;
+        }
+        i {
+          display: block;
+          width: 100%;
+          height: 1px;
+          background: #eee;
+          margin-top: 9px;
+        }
+        p {
           color: #101010;
           font-size: 16px;
           font-weight: bold;
@@ -385,7 +449,7 @@ export default {
         span {
           float: left;
           font-size: 14px;
-          color: #9B9B9B;
+          color: #9b9b9b;
           &:nth-child(2) {
             float: right;
             color: #101010;
