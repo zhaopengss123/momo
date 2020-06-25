@@ -25,20 +25,12 @@
             <span>{{ item.unitPrice }}</span>
           </li>
           <li>
-            <span>数量</span>
-            <span>{{ item.stock }}</span>
-          </li>
-          <li>
             <span>商品描述</span>
             <span>{{ item.propsDescribe }}</span>
           </li>
           <li>
             <span>配送方式</span>
             <span>{{ item.deliveryTypeName }}</span>
-          </li>
-          <li>
-            <span>合计金额</span>
-            <span>{{ item.unitPrice*item.stock }}元</span>
           </li>
         </ul>
       </div>
