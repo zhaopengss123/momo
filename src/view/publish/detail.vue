@@ -3,7 +3,7 @@
     <van-nav-bar title="道具详情" left-arrow @click-left="backFun" />
     <div>
       <div class="header">
-        <img :src="item.propsImg" />
+        <img :src="item.customerImgUrl || item.propsImg" />
         <div class="list-text">
           <p>{{ item.propsName }}</p>
           <p>{{ item.titleDescribe }}</p>
@@ -25,16 +25,20 @@
             <span>{{ item.unitPrice }}</span>
           </li>
           <li>
-            <span>商品描述</span>
-            <span>{{ item.propsDescribe }}</span>
-          </li>
-          <li>
             <span>配送方式</span>
             <span>{{ item.deliveryTypeName }}</span>
           </li>
+          <li>
+            <span>商品描述</span>
+            <span></span>
+          </li>
+          <li v-if="item.propsDescribe">
+            <span></span>
+            <span style="text-align:left; float:left; line-height:20px;">{{ item.propsDescribe }}</span>            
+          </li>
         </ul>
       </div>
-      <div class="submit-btn" @click="sbumitsBtn()">购买</div>
+      <div class="submit-btn" @click="sbumitsBtn()">{{ item.releaseType == 1 ? '购买' : '售卖' }}</div>
     </div>
     <!-- 购买 -->
     <van-popup
@@ -65,6 +69,7 @@
           placeholder="点击选择嘉宾"
           @click="showguestsPicker = true"
         />
+        <van-field v-model="form1.anchorName" name="主播姓名" label="主播姓名" placeholder="主播姓名" />
         <van-field
           readonly
           clickable
@@ -73,12 +78,6 @@
           label="配送方式"
           placeholder="点击选择配送方式"
           @click="showPicker = true"
-        />
-        <van-field
-          v-model="form1.anchorName"
-          name="主播姓名"
-          label="主播姓名"
-          placeholder="主播姓名"
         />
         <van-field
           readonly
@@ -103,15 +102,17 @@
       :style="{ height: 'auto',paddingTop:'10px',paddingBottom: '10px' }"
     >
       <van-form @submit="onSubmit2">
-        <van-field name="stepper" label="售卖数量">
+        <van-field name="stepper" label="数量">
           <template #input>
             <van-stepper v-model="stock" min="1" :max="item.stock" integer />
           </template>
         </van-field>
 
         <van-field v-model="leavingMsg" name="leavingMsg" label="备注" placeholder="备注" />
+        
 
         <div style="margin: 16px;">
+          <div class="resu">*注：售卖商品需要缴纳少量的保证金</div>
           <van-button round block type="info" native-type="submit">提交</van-button>
         </div>
       </van-form>
@@ -316,6 +317,11 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .detail {
+  .resu{
+    color: red;
+    font-size: 12px;
+    margin-bottom: 20px;
+  }
   & > div:nth-child(2) {
     overflow: hidden;
     padding-top: 19px;

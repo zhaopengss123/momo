@@ -5,12 +5,12 @@
     <div>
       <van-steps v-if="active != -10" :active="active" active-color="#e0305b">
         <van-step>待支付</van-step>
-        <van-step>代发货</van-step>
+        <van-step>待发货</van-step>
         <van-step>待审核</van-step>
         <van-step>交易成功</van-step>
       </van-steps>
       <div class="header">
-        <img :src="item.propsImgUlr" />
+        <img :src="item.customerImgUrl || item.propsImgUlr" />
         <div class="list-text">
           <p>{{ item.propsName }}</p>
           <p>{{ item.titleDescribe }}</p>
@@ -25,15 +25,7 @@
           <li>
             <p>订单详情</p>
           </li>
-          <li>
-            <span>订单号</span>
-            <span>{{ item.orderNo }}</span>
-          </li>
-          <li>
-            <span>支付时间</span>
-            <span>{{ item.payTime }}</span>
-          </li>
-          <li v-if="releaseType == 0 && item.orderStatus == 1">
+          <li v-if="item.orderStatus == 1">
             <span>支付剩余时间</span>
             <span>
               <b>{{ countDown.d }}</b>
@@ -46,7 +38,7 @@
               <b>秒</b>
             </span>
           </li>
-          <li v-if="releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)">
+          <li v-if=" (item.orderStatus == 4 || item.orderStatus == 5)">
             <span>自动确认收货时间</span>
             <span>
               <b>{{ countDown.d }}</b>
@@ -59,17 +51,65 @@
               <b>秒</b>
             </span>
           </li>
-          <li class="line">
+          <li v-if="item.orderStatus != 1">
+            <span>订单号</span>
+            <span>{{ item.orderNo }}</span>
+          </li>
+          <li
+            v-if="item.roomNumber && ((releaseType == 1 && item.payStatus == 1) || releaseType == 0) "
+          >
+            <span>直播间号</span>
+            <span>{{ item.roomNumber }}</span>
+          </li>
+          <li
+            v-if="item.guestsName && ((releaseType == 1 && item.payStatus == 1) || releaseType == 0) "
+          >
+            <span>嘉宾</span>
+            <span>{{ item.guestsName }}</span>
+          </li>
+          <li
+            v-if="item.anchorName && ((releaseType == 1 && item.payStatus == 1) || releaseType == 0) "
+          >
+            <span>主播名</span>
+            <span>{{ item.anchorName }}</span>
+          </li>
+          <li
+            v-if="item.leavingMsg && ((releaseType == 1 && item.payStatus == 1) || releaseType == 0) "
+          >
+            <span>备注</span>
+            <span></span>
+          </li>
+
+          <li
+            style="height:auto;"
+            v-if="item.leavingMsg && ((releaseType == 1 && item.payStatus == 1) || releaseType == 0) "
+          >
+            <span></span>
+            <span
+              style="text-align:left; float:left; line-height:20px; margin-bottom:15px;"
+            >{{ item.leavingMsg }}</span>
+          </li>
+          <li v-if="item.payTime">
+            <span>下单时间</span>
+            <span>{{ item.payTime }}</span>
+          </li>
+
+          <li class="line" v-if=" ((releaseType == 1 && item.payStatus == 1) || releaseType == 0) ">
             <i></i>
           </li>
-          <li>
+          <li
+            v-if="item.deliveryTypeName && ((releaseType == 1 && item.payStatus == 1) || releaseType == 0) "
+          >
             <span>配送方式</span>
             <span>{{ item.deliveryTypeName }}</span>
           </li>
-          <li v-if="releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)">
-            <span>发货名</span>
-            <span>{{ item.sendGoodsName }}</span>
+          <li
+            v-if="item.deliveryTime && ((releaseType == 1 && item.payStatus == 1) || releaseType == 0) "
+          >
+            <span>配送时间</span>
+            <span>{{ item.deliveryTime }}</span>
           </li>
+
           <li class="line">
             <i></i>
           </li>
@@ -85,28 +125,51 @@
             <span>总金额</span>
             <span>{{ item.totalPrice }}</span>
           </li>
-          <li>
+          <li v-if="item.payPrice && item.orderStatus != 1">
             <span>支付金额</span>
             <span>{{ item.payPrice }}</span>
           </li>
-          <li v-if="item.isSell == 0">
-            <span>房间号</span>
-            <span>{{ item.roomNumber }}</span>
-          </li>
-          <li v-if="item.isSell == 0">
-            <span>主播名</span>
-            <span>{{ item.guestsName }}</span>
-          </li>
-          <li v-if="item.isSell == 0">
-            <span>嘉宾</span>
-            <span>{{ item.anchorName }}</span>
-          </li>
+
           <li>
             <span>商品描述</span>
-            <span>{{ item.propsDescribe }}</span>
+            <span></span>
+          </li>
+          <li style="height:auto;">
+            <span></span>
+            <span
+              style="text-align:left; float:left; line-height:20px; margin-bottom:15px;"
+            >{{ item.propsDescribe }}</span>
           </li>
 
-          <li v-if="releaseType == 1 && item.orderStatus == 3">
+          <li class="line" v-if="releaseType == 1 && item.releaseType == 1">
+            <i></i>
+          </li>
+          <li v-if="releaseType == 1 && item.releaseType == 1">
+            <span>保证金</span>
+            <span>{{ item.cashDeposit }}</span>
+          </li>
+          <li v-if="releaseType == 1 && item.releaseType == 1">
+            <span>服务费</span>
+            <span>{{ item.serviceCharge }}</span>
+          </li>
+
+          <li class="line">
+            <i></i>
+          </li>
+          <li v-if="item.startAppealTime">
+            <span>申诉开始时间</span>
+            <span>{{ item.startAppealTime }}</span>
+          </li>
+          <li v-if="item.endAppealTime">
+            <span>申诉结算时间</span>
+            <span>{{ item.endAppealTime }}</span>
+          </li>
+          <li v-if="item.appealExplain">
+            <span>申诉原因</span>
+            <span>{{ item.appealExplain }}</span>
+          </li>
+
+          <li v-if="(releaseType == 1 && item.orderStatus == 3) ">
             <span>发货名</span>
             <span>
               <input
@@ -117,15 +180,39 @@
               />
             </span>
           </li>
-          <li v-if="releaseType == 1 && item.orderStatus == 3">
+
+          <li v-if="(releaseType == 1 && item.orderStatus == 3) ">
             <span>上传截图</span>
             <span></span>
           </li>
           <van-uploader
-            v-if="releaseType == 1 && item.orderStatus == 3"
+            v-if="(releaseType == 1 && item.orderStatus == 3) "
             v-model="fileList"
             multiple
+            :max-count="4"
+            :after-read="afterRead"
+            :before-delete="delImg"
           />
+          <li v-if="item.confirmTime">
+            <span>交易状态</span>
+            <span>交易成功</span>
+          </li>
+
+          <li v-if="releaseType == 1  &&  item.costSettlementTime">
+            <span>结算时间</span>
+            <span>{{ item.costSettlementTime }}</span>
+          </li>
+          <li v-if="releaseType == 1  && item.costSettlement">
+            <span>结算金额</span>
+            <span>{{ item.costSettlement }}</span>
+          </li>
+
+          <li
+            v-if=" (item.orderStatus == 4 || item.orderStatus == 5 || item.orderStatus == 6 || item.orderStatus == 8 || item.orderStatus == 9 || item.orderStatus == 10)"
+          >
+            <span>发货名</span>
+            <span>{{ item.sendGoodsName }}</span>
+          </li>
           <li v-if="imgList.length">
             <span>发货截图</span>
             <span></span>
@@ -133,14 +220,32 @@
         </ul>
       </div>
       <div class="list-img" v-if="imgList.length">
-        <img v-for="(item,index) in imgList" :key="index" :src="item" />
+        <van-image
+        v-for="(item,index) in imgList" :key="index"
+        @click="openImg(item)"
+          width="75px"
+          height="75px"
+          fit="cover"
+          :src="item"
+        />
       </div>
-      <div class="submit-btn" @click="subPay" v-if="releaseType == 0 && item.orderStatus == 1">去支付</div>
+      <div
+        class="submit-btn"
+        @click="subPay"
+        v-if=" (item.releaseType == 1 && releaseType == 0 && item.orderStatus == 1) || (item.releaseType == 0 && releaseType == 1 && item.orderStatus == 1)"
+      >去支付</div>
       <div
         class="submit-btn"
         v-if="releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)"
         @click="submitReceive"
       >确认收货</div>
+
+      <van-cell-group
+        style="margin-top:20px"
+        v-if="releaseType == 0 && (item.orderStatus == 4 || item.orderStatus == 5)"
+      >
+        <van-field v-model="msg" label="申诉原因" placeholder="请输入申诉原因" />
+      </van-cell-group>
       <div
         class="submit-btn close-btn"
         @click="appeal"
@@ -148,19 +253,28 @@
       >订单申诉</div>
       <div
         class="submit-btn"
-        v-if="releaseType == 1 && item.orderStatus == 3"
+        v-if="(releaseType == 1 && item.orderStatus == 3) "
         @click="sendGoods()"
       >去发货</div>
+      <div
+        class="submit-btn close-btn"
+        @click="dismount"
+        v-if="releaseType == 1 && (item.orderStatus == 2 || item.orderStatus == 3 || item.orderStatus == 4 || item.orderStatus == 5 )"
+      >取消订单</div>
     </div>
+    
   </div>
 </template>
 
 <script>
+// import $ from "jquery";
+import {ImagePreview} from "vant";
 import { TransfromDateTimes, getopenId } from "@/assets/utils";
 export default {
   name: "Detail",
   data() {
     return {
+      msg: null,
       item: {},
       imgList: [],
       fileList: [],
@@ -169,10 +283,14 @@ export default {
       releaseType: null,
       orderStatus: null,
       active: 0,
-      countDown: {}
+      countDown: {},
+      imgUrl: []
     };
   },
   methods: {
+    openImg(url){
+      ImagePreview([url]);
+    },
     backFun() {
       this.$router.push({
         name: "ShopList",
@@ -183,6 +301,41 @@ export default {
         }
       });
     },
+    delImg(file, state) {
+      this.fileList.splice(state.index, 1);
+      this.imgUrl.splice(state.index, 1);
+    },
+    afterRead(files) {
+      let file = files.file;
+      let param = new FormData();
+      files.status = "uploading";
+      files.message = "上传中...";
+      param.append("file", file, file.name);
+      param.append("openId", this.$store.state.openId);
+      param.append("releasePropsId", this.item.propsOrderId);
+      const that = this;
+      $.ajax({
+        url: "https://momoserver.beituokj.com/web/release/uploadImg",
+        type: "post",
+        data: param,
+        contentType: false,
+        processData: false,
+        success: function(data) {
+          if (data.returnCode == "SUCCESS") {
+            files.status = "done";
+            that.imgUrl.push(data.result.host + data.result.url);
+          } else {
+            files.status = "failed";
+            file.message = "上传失败";
+          }
+        },
+        error: function(data) {
+          files.status = "failed";
+          file.message = "上传失败";
+        }
+      });
+    },
+
     // 确定申诉该订单
     appeal() {
       this.$dialog
@@ -192,7 +345,10 @@ export default {
         })
         .then(() => {
           this.axios
-            .post(`/propsOrder/appeal/${this.item.propsOrderId}`, {})
+            .post(`/propsOrder/appeal`, {
+              msg: this.msg,
+              propsOrderId: this.item.propsOrderId
+            })
             .then(res => {
               if (res.data.returnCode == "SUCCESS") {
                 this.$toast.success("提交成功！工作人员会尽快处理");
@@ -245,7 +401,7 @@ export default {
             .post(`/propsOrder/sendGoods`, {
               propsOrderId: this.item.propsOrderId,
               openId: this.$store.state.openId,
-              imgUrl: this.fileList.join(","),
+              imgUrl: this.imgUrl.join(","),
               sendGoodsName: this.sendGoodsName
             })
             .then(res => {
@@ -275,14 +431,14 @@ export default {
       this.$dialog
         .confirm({
           title: "提示",
-          message: "确定下架该道具"
+          message: "确定取消该订单吗？"
         })
         .then(() => {
           this.axios
-            .post(`/release/dismount/${this.item.propsOrderId}`)
+            .post(`/propsOrder/cancel/${this.item.propsOrderId}`)
             .then(res => {
               if (res.data.returnCode == "SUCCESS") {
-                this.$toast.success("下架成功");
+                this.$toast.success("取消订单成功");
                 setTimeout(() => {
                   this.$router.push({
                     name: "ShopList",
@@ -379,19 +535,19 @@ export default {
           this.imgList = res.data.result.sendGoodsImg
             ? res.data.result.sendGoodsImg.split(",")
             : [];
-          if (
-            this.releaseType == 0 &&
-            this.item.orderStatus == 1 &&
-            this.item.payTimeOut
-          ) {
-            let payTimeOut = new Date(this.item.payTimeOut).getTime();
+          if (this.item.orderStatus == 1 && this.item.payTimeOut) {
+            let payTimeOut = this.item.payTimeOut.replace(/-/g, "/");
+            payTimeOut = new Date(payTimeOut).getTime();
+
             this.getCountDown(payTimeOut);
           }
 
           if (
-           this.releaseType == 0 && (this.item.orderStatus == 4 || this.item.orderStatus == 5) && this.item.confirmTimeOut
+            (this.item.orderStatus == 4 || this.item.orderStatus == 5) &&
+            this.item.confirmTimeOut
           ) {
-            let confirmTimeOut = new Date(this.item.confirmTimeOut).getTime();
+            let confirmTimeOut = this.item.confirmTimeOut.replace(/-/g, "/");
+            confirmTimeOut = new Date(confirmTimeOut).getTime();
             this.getCountDown(confirmTimeOut);
           }
 
@@ -414,6 +570,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .detail {
+  .van-image{
+    border: solid 1px #ccc;
+    margin: 2px ;
+  }
   .name-text {
     font-size: 15px;
     text-align: right;
@@ -518,7 +678,7 @@ export default {
           &:nth-child(2) {
             float: right;
             color: #101010;
-            text-align: right !important;
+            text-align: right;
           }
           &:nth-child(1) {
           }

@@ -1,4 +1,5 @@
 <template>
+
   <div class="index">
     <van-nav-bar title="陌陌道具城" />
     <div class="seach">
@@ -32,6 +33,7 @@
       </div>
     </div>
     <list-component :propsName="propsName" ref="child"></list-component>
+
     <footer-component></footer-component>
   </div>
 </template>
@@ -44,11 +46,12 @@ export default {
   data() {
     return {
       bannerList: [],
-      propsName: ""
+      propsName: "",
     };
   },
   components: { listComponent, footerComponent },
   methods: {
+
     getBanner() {
       this.axios
         .post("/banner/all")

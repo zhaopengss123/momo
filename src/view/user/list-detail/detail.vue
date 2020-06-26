@@ -3,7 +3,7 @@
     <van-nav-bar title="道具详情" left-arrow @click-left="backFun" />
     <div>
       <div class="header">
-        <img :src="item.propsImgUrl" />
+        <img :src="item.customerImgUrl || item.propsImgUrl" />
         <div class="list-text">
           <p>{{ item.propsName }}</p>
           <p>{{ item.titleDescribe }}</p>
@@ -37,8 +37,9 @@
           </li>
           <li>
             <span>商品描述</span>
-            <span>{{ item.propsDescribe }}</span>
+            <span></span>
           </li>
+          <li style="height:auto;"><span></span><span style="text-align:left; float:left; line-height:20px;">{{ item.propsDescribe }}</span></li>
           <li v-if="item.downShelfTime">
             <span>下架时间</span>
             <span>{{ item.downShelfTime }}</span>
@@ -315,7 +316,7 @@ export default {
           &:nth-child(2) {
             float: right;
             color: #101010;
-            text-align: right !important;
+            text-align: right;
           }
           &:nth-child(1) {
           }

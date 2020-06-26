@@ -55,12 +55,7 @@
           placeholder="直播间号"
           :rules="[{ required: true, message: '请填写直播间号' }]"
         />
-        <van-field
-          v-model="form1.anchorName"
-          name="主播姓名"
-          label="主播姓名"
-          placeholder="主播姓名"
-        />
+        <van-field v-model="form1.anchorName" name="主播姓名" label="主播姓名" placeholder="主播姓名" />
         <van-field
           readonly
           clickable
@@ -105,22 +100,18 @@
           placeholder="数量"
           :rules="[{ required: true, message: '请填写数量' }]"
         />
-          <van-field
-          v-if="selectClass.customerImg && selectClass.customerImg == 1"
+
+        <van-field
+        v-if="selectClass.customerImg && selectClass.customerImg == 1"
           name="form1.imgUrl"
           label="道具图片"
           :rules="[{ required: true, message: '请填写道具图片' }]"
         >
           <template #input>
-            <van-uploader v-model="customerImg" :max-count="1" :after-read="afterRead" />
+            <van-uploader v-model="customerImg" :max-count="1" :after-read="afterRead" :before-delete="delImg1" />
           </template>
-        </van-field> 
-        <van-field
-          v-model="form1.describe"
-          name="道具描述"
-          label="道具描述"
-          placeholder="道具描述"
-        />
+        </van-field>
+        <van-field v-model="form1.describe" name="道具描述" label="道具描述" placeholder="道具描述" />
         <div style="margin: 16px;">
           <van-button
             class="sbtn"
@@ -169,25 +160,19 @@
           placeholder="数量"
           :rules="[{ required: true, message: '请填写数量' }]"
         />
-
-          <van-field
+        <van-field
           v-if="selectClass.customerImg && selectClass.customerImg == 1"
-          name="form1.imgUrl"
+          name="form2.imgUrl"
           label="道具图片"
           :rules="[{ required: true, message: '请填写道具图片' }]"
         >
           <template #input>
-            <van-uploader v-model="customerImg" :max-count="1" :after-read="afterRead" />
+            <van-uploader v-model="customerImg2" :max-count="1" :after-read="afterRead2" :before-delete="delImg2" />
           </template>
-        </van-field> 
+        </van-field>
 
-        <van-field
-          v-model="form2.describe"
-          name="道具描述"
-          label="道具描述"
-          placeholder="道具描述"
-        />
- 
+        <van-field v-model="form2.describe" name="道具描述" label="道具描述" placeholder="道具描述" />
+
         <div style="margin: 16px;">
           <van-button
             class="sbtn"
@@ -202,8 +187,9 @@
     </div>
     <div class="footer">
       <div v-if="selectClass.serviceCharge ||  selectClass.cashDeposit">
-      *<span v-if="selectClass.serviceCharge">含{{ selectClass.serviceCharge }}服务费 </span>
-      <span v-if="selectClass.cashDeposit">{{ selectClass.cashDeposit }}保证金</span>
+        *
+        <span v-if="selectClass.serviceCharge">含{{ selectClass.serviceCharge }}服务费</span>
+        <span v-if="selectClass.cashDeposit">{{ selectClass.cashDeposit }}保证金</span>
       </div>
     </div>
 
@@ -254,13 +240,12 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { TransfromDateTimes, getopenId } from "@/assets/utils";
 export default {
   name: "Index",
   data() {
     return {
-      seachText: '',
+      seachText: "",
       distributionTime: new Date(),
       subLoading: false,
       toggleIndex: 1,
@@ -275,6 +260,8 @@ export default {
       guestsList: [],
       totalMoney: 0,
       showPickertime1: false,
+      customerImg: [],
+      customerImg2: [],
       form1: {
         deliveryTypeId: null,
         deliveryTypeName: null,
@@ -305,21 +292,59 @@ export default {
     };
   },
   methods: {
+    delImg1(file,state){
+      this.customerImg.splice(state.index,1);
+      this.form1.imgUrl = [];
+    },
+    delImg2(file,state){
+      this.customerImg2.splice(state.index,1);
+      this.form2.imgUrl = [];
+    },
     afterRead(files) {
       let file = files.file;
-      let param = new FormData(); 
-      param.append('file',file,file.name); 
-      param.append('openId',this.$store.state.openId);   
-       param.append('releasePropsId',this.selectClass.id);
-    const instance=axios.create({
-       withCredentials: true,
-       headers: {"Accept": "*/*",}
-    })
-      // this.axios.post(`/release/uploadImg`, formData, config).then(res => {});
-      instance.post('/release/uploadImg',param)
-          .then(response=>{
-              console.log(response.data);
-          })   
+      let param = new FormData();
+      param.append("file", file, file.name);
+      param.append("openId", this.$store.state.openId);
+      param.append("releasePropsId", this.selectClass.id);
+      const that = this;
+      $.ajax({
+        url: "https://momoserver.beituokj.com/web/release/uploadImg",
+        type: "post",
+        data: param,
+        contentType: false,
+        processData: false,
+        success: function(data) {
+          if (data.returnCode == "SUCCESS") {
+            that.form1.imgUrl =data.result.host + data.result.url;
+          }
+        },
+        error: function(data) {
+          this.$dialog({ message: "上传失败！" });
+        }
+      });
+    },
+    afterRead2(files) {
+      let file = files.file;
+      let param = new FormData();
+      param.append("file", file, file.name);
+      param.append("openId", this.$store.state.openId);
+      param.append("releasePropsId", this.selectClass.id);
+      const that = this;
+      $.ajax({
+        url: "https://momoserver.beituokj.com/web/release/uploadImg",
+        type: "post",
+        data: param,
+        contentType: false,
+        processData: false,
+        success: function(data) {
+          if (data.returnCode == "SUCCESS") {
+            that.form2.imgUrl = data.result.url;
+          }
+        },
+        error: function(data) {
+          this.$dialog({ message: "上传失败！" });
+        }
+      });
     },
     onConfirm(val) {
       this.form1.deliveryTypeId = val.id;
@@ -361,7 +386,8 @@ export default {
           openId: this.$store.state.openId,
           titleDescribe: this.form1.titleDescribe,
           sceneInfo: this.sceneInfo,
-          distributionTime: this.form1.distributionTime
+          distributionTime: this.form1.distributionTime,
+          imgUrl: this.form1.imgUrl
         })
         .then(res => {
           this.subLoading = false;
@@ -370,21 +396,21 @@ export default {
             WeixinJSBridge.invoke(
               "getBrandWCPayRequest",
               {
-                appId:  res.data.result.appId, //公众号名称，由商户传入
-                timeStamp: ''+res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                appId: res.data.result.appId, //公众号名称，由商户传入
+                timeStamp: "" + res.data.result.timeStamp, //时间戳，自1970年以来的秒数
                 nonceStr: res.data.result.nonceStr, //随机串
                 package: res.data.result.packages,
-                signType:  res.data.result.signType, //微信签名方式：
+                signType: res.data.result.signType, //微信签名方式：
                 paySign: res.data.result.paySign //微信签名
               },
               function(res) {
                 if (res.err_msg == "get_brand_wcpay_request:ok") {
-                    that.$router.push({ path: '/index' });
-                }else{
-                  this.$dialog({ message: '支付失败！' });
-                  setTimeout(()=>{
-                    that.$router.push({ path: '/index' });
-                  },1500)
+                  that.$router.push({ path: "/index" });
+                } else {
+                  this.$dialog({ message: "支付失败！" });
+                  setTimeout(() => {
+                    that.$router.push({ path: "/index" });
+                  }, 1500);
                 }
               }
             );
@@ -407,7 +433,8 @@ export default {
           stock: this.form2.stock,
           describe: this.form2.describe,
           openId: this.$store.state.openId,
-          titleDescribe: this.form2.titleDescribe
+          titleDescribe: this.form2.titleDescribe,
+          imgUrl: this.form2.imgUrl
         })
         .then(res => {
           this.subLoading = false;
@@ -415,16 +442,16 @@ export default {
             WeixinJSBridge.invoke(
               "getBrandWCPayRequest",
               {
-                appId:  res.data.result.appId, //公众号名称，由商户传入
-                timeStamp: ''+res.data.result.timeStamp, //时间戳，自1970年以来的秒数
+                appId: res.data.result.appId, //公众号名称，由商户传入
+                timeStamp: "" + res.data.result.timeStamp, //时间戳，自1970年以来的秒数
                 nonceStr: res.data.result.nonceStr, //随机串
                 package: res.data.result.packages,
-                signType:  res.data.result.signType, //微信签名方式：
+                signType: res.data.result.signType, //微信签名方式：
                 paySign: res.data.result.paySign //微信签名
               },
               function(res) {
-                if(res.err_msg == "get_brand_wcpay_request:ok" ){
-                    that.$router.push({ path: '/index' });
+                if (res.err_msg == "get_brand_wcpay_request:ok") {
+                  that.$router.push({ path: "/index" });
                 }
               }
             );
@@ -446,7 +473,7 @@ export default {
           if (res.data.returnCode == "SUCCESS") {
             this.commodityList = res.data.result || [];
             this.parescommodityList = res.data.result;
-            this.seachText = '';
+            this.seachText = "";
           }
         })
         .catch(error => {
@@ -485,12 +512,12 @@ export default {
       }
     });
   },
-    watch: {
-      seachText(val) {
-        let commodityList = JSON.parse(JSON.stringify(this.parescommodityList));
-        let arr = commodityList.filter(item=>item.name.indexOf(val)!=-1);
-        this.commodityList = arr;
-      }
+  watch: {
+    seachText(val) {
+      let commodityList = JSON.parse(JSON.stringify(this.parescommodityList));
+      let arr = commodityList.filter(item => item.name.indexOf(val) != -1);
+      this.commodityList = arr;
+    }
   }
 };
 </script>
@@ -498,10 +525,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .index {
-
-  .footer{
+  .footer {
     text-align: center;
-    color: #9096A9;
+    color: #9096a9;
     font-size: 14px;
     margin-bottom: 55px;
   }

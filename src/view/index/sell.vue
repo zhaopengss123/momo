@@ -28,8 +28,8 @@ export default {
   mounted() {
   },
   watch:{
-    propsName(val){
-        this.$refs.child.getData(1,val);
+    propsName(val) {
+      this.$refs.child.getData(1, val, true);
     }
   }
 };

@@ -5,7 +5,7 @@
     <div class="list-main">
       <ul>
         <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item.propsOrderId)">
-          <img :src="item.propsImgUlr" />
+          <img :src="item.customerImgUrl || item.propsImgUlr" />
           <div class="list-text">
             <p>
               {{ item.propsName }}
@@ -13,7 +13,8 @@
               <i v-if="item.releaseType == 0">求购</i>
             </p>
             <p>{{ item.titleDescribe }}</p>
-            <p>状态：{{ item.orderStatus == 1 ? '待付款' : item.orderStatus == 2 ? '已付款' : item.orderStatus == 3 ? '待发货' : item.orderStatus == 4 ? '已发货' : item.orderStatus == 5 ? '待确认' : item.orderStatus == 6 ? '交易成功' : item.orderStatus == 7 ? '交易关闭' :item.orderStatus == 8 ? '申诉中' :item.orderStatus == 9 ? '申诉成功' :item.orderStatus == 10 ? '申述失败' : '--' }}</p>
+            <!-- <p>状态：{{ item.orderStatus == 1 ? '待付款' : item.orderStatus == 2 ? '已付款' : item.orderStatus == 3 ? '待发货' : item.orderStatus == 4 ? '已发货' : item.orderStatus == 5 ? '待确认' : item.orderStatus == 6 ? '交易成功' : item.orderStatus == 7 ? '交易关闭' :item.orderStatus == 8 ? '申诉中' :item.orderStatus == 9 ? '申诉成功' :item.orderStatus == 10 ? '申述失败' : '--' }}</p> -->
+            <p>状态：{{ item.closeName }}</p>
           </div>
           <div class="right-pirce">
           </div>
@@ -115,7 +116,6 @@ export default {
       .list-text {
         color: #9096a9;
         font-size: 12px;
-        width: 200px;
         float: left;
         margin-left: 10px;
         p:nth-child(1) {

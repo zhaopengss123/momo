@@ -17,7 +17,7 @@
     <div class="list-main">
       <ul>
         <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item.releasePropsId)">
-          <img :src="item.propsImgUrl" />
+          <img :src="item.customerImgUrl || item.propsImgUrl" />
           <div class="list-text">
             <p>
               {{ item.propsName }}

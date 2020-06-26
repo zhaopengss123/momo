@@ -6,38 +6,45 @@
         <van-dropdown-item title="筛选" ref="item">
           <van-field type="number" v-model="unitPrice" label="单价" placeholder="请输入单价" />
           <van-dropdown-menu>
-            <van-dropdown-item v-model="starlight" :options="starlightList" />
+            <van-dropdown-item v-model="deliveryId" get-container="body" :options="deliveryList" />
           </van-dropdown-menu>
           <van-dropdown-menu>
-            <van-dropdown-item v-model="privilege" :options="privilegeList" />
+            <van-dropdown-item v-model="starlight" get-container="body" :options="starlightList" />
           </van-dropdown-menu>
           <van-dropdown-menu>
-            <van-dropdown-item v-model="deliveryId" :options="deliveryList" />
+            <van-dropdown-item v-model="privilege" get-container="body" :options="privilegeList" />
           </van-dropdown-menu>
+
           <van-button block type="info" @click="reset1">确认</van-button>
         </van-dropdown-item>
       </van-dropdown-menu>
     </div>
-    <div class="list-main">
-      <ul>
-        <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item.id,item.releaseType)">
-          <img :src="item.propsImg" />
-          <div class="list-text">
-            <p>
-              {{ item.name }}
-              <span v-if="item.releaseType == 1">售卖</span>
-              <i v-if="item.releaseType == 0">求购</i>
-            </p>
-             <p>{{ item.titleDescribe }}</p>
-            <p v-if="item.createTime">{{ item.createTime }}</p>
-          </div>
-          <div class="right-pirce">
-            <p>¥{{ item.unitPrice }}</p>
-            <p>库存{{ item.stock }}</p>
-          </div>
-        </li>
-      </ul>
-    </div>
+    <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+      <div class="list-main">
+        <ul>
+          <li
+            v-for="(item,index) in dataList"
+            :key="index"
+            @click="toDetail(item.id,item.releaseType)"
+          >
+            <img :src="item.customerImgUrl || item.propsImg" />
+            <div class="list-text">
+              <p>
+                {{ item.name }}
+                <span v-if="item.releaseType == 1">售卖</span>
+                <i v-if="item.releaseType == 0">求购</i>
+              </p>
+              <p>{{ item.titleDescribe }}</p>
+              <p v-if="item.createTime">{{ item.createTime }}</p>
+            </div>
+            <div class="right-pirce">
+              <p>¥{{ item.unitPrice }}</p>
+              <p>库存{{ item.stock }}</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </van-pull-refresh>
   </div>
 </template>
 
@@ -97,12 +104,20 @@ export default {
           text: "不限制配送方式",
           value: null
         }
-      ]
+      ],
+      isLoading: false
     };
   },
   methods: {
+    onRefresh() {
+      this.getData(1);
+      this.pageNo = 1;
+    },
     toDetail(id, releaseType) {
-      this.$router.push({ name: "Publishdetail", params: { id: id,releaseType:releaseType } });
+      this.$router.push({
+        name: "Publishdetail",
+        params: { id: id, releaseType: releaseType }
+      });
     },
     getData(pageNo = this.pageNo, propsName, isseach = false) {
       let pageNos = pageNo;
@@ -110,7 +125,7 @@ export default {
         .post("release/search", {
           pageNo: pageNo,
           pageSize: this.pageSize,
-          propsName: !propsName&&!isseach ? this.propsName : propsName,
+          propsName: !propsName && !isseach ? this.propsName : propsName,
           starlight: this.starlight,
           sort: this.sort,
           isSell: this.isSell,
@@ -119,6 +134,7 @@ export default {
           unitPrice: this.unitPrice
         })
         .then(res => {
+          this.isLoading = false;
           this.pages = res.data.result.length ? this.pages + 1 : this.pages;
           if (pageNos != 1) {
             if (res.data.result.length) {
@@ -213,8 +229,12 @@ export default {
       }
     }
   }
+  .van-pull-refresh__track.van-pull-refresh__track {
+    overflow: hidden;
+  }
   .list-main {
     width: 100%;
+
     ul > li {
       overflow: hidden;
       padding-top: 19px;
@@ -256,8 +276,8 @@ export default {
             line-height: 16px;
             text-align: center;
             font-weight: normal;
-            background:rgba(255,142,57,0.1);
-            color: #FF8E39;
+            background: rgba(255, 142, 57, 0.1);
+            color: #ff8e39;
             font-style: normal;
             font-size: 10px;
             margin-left: 10px;
