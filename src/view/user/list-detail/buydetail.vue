@@ -10,7 +10,7 @@
         <van-step>交易成功</van-step>
       </van-steps>
       <div class="header">
-        <img :src="item.customerImgUrl || item.propsImgUlr" />
+        <img @click="openImg(item.customerImgUrl)" :src="item.customerImgUrl || item.propsImgUlr" />
         <div class="list-text">
           <p>{{ item.propsName }}</p>
           <p>{{ item.titleDescribe }}</p>
@@ -27,7 +27,7 @@
           </li>
           <li v-if="item.orderStatus == 1">
             <span>支付剩余时间</span>
-            <span>
+            <span style="color:red;">
               <b>{{ countDown.d }}</b>
               <b>天</b>
               <b>{{ countDown.h }}</b>
@@ -40,7 +40,7 @@
           </li>
           <li v-if=" (item.orderStatus == 4 || item.orderStatus == 5)">
             <span>自动确认收货时间</span>
-            <span>
+            <span style="color:red;">
               <b>{{ countDown.d }}</b>
               <b>天</b>
               <b>{{ countDown.h }}</b>
@@ -221,8 +221,9 @@
       </div>
       <div class="list-img" v-if="imgList.length">
         <van-image
-        v-for="(item,index) in imgList" :key="index"
-        @click="openImg(item)"
+          v-for="(item,index) in imgList"
+          :key="index"
+          @click="openImg(item)"
           width="75px"
           height="75px"
           fit="cover"
@@ -262,14 +263,13 @@
         v-if="releaseType == 1 && (item.orderStatus == 2 || item.orderStatus == 3 || item.orderStatus == 4 || item.orderStatus == 5 )"
       >取消订单</div>
     </div>
-    
   </div>
 </template>
 
 <script>
-// import $ from "jquery";
-import {ImagePreview} from "vant";
-import { TransfromDateTimes, getopenId } from "@/assets/utils";
+import { ImagePreview } from "vant";
+import { TransfromDateTimes, setOpenId } from "@/assets/utils";
+
 export default {
   name: "Detail",
   data() {
@@ -288,8 +288,10 @@ export default {
     };
   },
   methods: {
-    openImg(url){
-      ImagePreview([url]);
+    openImg(url) {
+      if (url) {
+        ImagePreview([url]);
+      }
     },
     backFun() {
       this.$router.push({
@@ -520,6 +522,9 @@ export default {
     }
   },
   mounted() {
+    if (!setOpenId(this.$store.state.openId)) {
+      return false;
+    }
     this.releaseType = this.$route.params.releaseType;
     this.orderStatus = this.$route.params.orderStatus;
     const releaseId = this.$route.params.releaseId;
@@ -570,9 +575,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .detail {
-  .van-image{
+  .van-image {
     border: solid 1px #ccc;
-    margin: 2px ;
+    margin: 2px;
   }
   .name-text {
     font-size: 15px;
@@ -616,7 +621,7 @@ export default {
     .list-text {
       color: #9096a9;
       font-size: 12px;
-      width: 200px;
+      width: auto;
       float: left;
       margin-left: 10px;
       p:nth-child(1) {

@@ -5,7 +5,7 @@
     <div class="list-main">
       <ul>
         <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item.propsOrderId)">
-          <img :src="item.customerImgUrl || item.propsImgUlr" />
+          <img @click="openImg(item.customerImgUrl)" :src="item.customerImgUrl || item.propsImgUlr" />
           <div class="list-text">
             <p>
               {{ item.propsName }}
@@ -16,8 +16,7 @@
             <!-- <p>状态：{{ item.orderStatus == 1 ? '待付款' : item.orderStatus == 2 ? '已付款' : item.orderStatus == 3 ? '待发货' : item.orderStatus == 4 ? '已发货' : item.orderStatus == 5 ? '待确认' : item.orderStatus == 6 ? '交易成功' : item.orderStatus == 7 ? '交易关闭' :item.orderStatus == 8 ? '申诉中' :item.orderStatus == 9 ? '申诉成功' :item.orderStatus == 10 ? '申述失败' : '--' }}</p> -->
             <p>状态：{{ item.closeName }}</p>
           </div>
-          <div class="right-pirce">
-          </div>
+          <div class="right-pirce"></div>
         </li>
       </ul>
     </div>
@@ -25,6 +24,9 @@
 </template>
 
 <script>
+import { setOpenId } from "@/assets/utils";
+import { ImagePreview } from "vant";
+
 export default {
   name: "ReleaseInfo",
   data() {
@@ -37,8 +39,13 @@ export default {
     };
   },
   methods: {
+    openImg(url) {
+      if (url) {
+        ImagePreview([url]);
+      }
+    },
     backFun() {
-      this.$router.push({ path: '/user'  });
+      this.$router.push({ path: "/user" });
     },
     getDList() {
       this.axios
@@ -59,10 +66,21 @@ export default {
         });
     },
     toDetail(releaseId) {
-      this.$router.push({ name: "Buydetail", params: { releaseId, releaseType: this.releaseType,orderStatus:this.orderStatus, titleText: this.titleText } });
+      this.$router.push({
+        name: "Buydetail",
+        params: {
+          releaseId,
+          releaseType: this.releaseType,
+          orderStatus: this.orderStatus,
+          titleText: this.titleText
+        }
+      });
     }
   },
   mounted() {
+    if (!setOpenId(this.$store.state.openId)) {
+      return false;
+    }
     this.releaseType = this.$route.params.releaseType;
     this.orderStatus = this.$route.params.orderStatus;
     this.getDList();
@@ -117,6 +135,7 @@ export default {
         color: #9096a9;
         font-size: 12px;
         float: left;
+        width: auto;
         margin-left: 10px;
         p:nth-child(1) {
           color: #101010;

@@ -3,7 +3,7 @@
     <van-nav-bar title="道具详情" left-arrow @click-left="backFun" />
     <div>
       <div class="header">
-        <img :src="item.customerImgUrl || item.propsImg" />
+        <img @click="openImg(item.customerImgUrl)" :src="item.customerImgUrl || item.propsImg" />
         <div class="list-text">
           <p>{{ item.propsName }}</p>
           <p>{{ item.titleDescribe }}</p>
@@ -34,7 +34,7 @@
           </li>
           <li v-if="item.propsDescribe">
             <span></span>
-            <span style="text-align:left; float:left; line-height:20px;">{{ item.propsDescribe }}</span>            
+            <span style="text-align:left; float:left; line-height:20px;">{{ item.propsDescribe }}</span>
           </li>
         </ul>
       </div>
@@ -109,10 +109,9 @@
         </van-field>
 
         <van-field v-model="leavingMsg" name="leavingMsg" label="备注" placeholder="备注" />
-        
 
         <div style="margin: 16px;">
-          <div class="resu">*注：售卖商品需要缴纳少量的保证金</div>
+          <div class="resu">*注：{{ serviceMsg }}</div>
           <van-button round block type="info" native-type="submit">提交</van-button>
         </div>
       </van-form>
@@ -149,7 +148,9 @@
 </template>
 
 <script>
-import { TransfromDateTimes, getopenId } from "@/assets/utils";
+import { TransfromDateTimes, setOpenId } from "@/assets/utils";
+import { ImagePreview } from "vant";
+
 export default {
   name: "Detail",
   data() {
@@ -166,6 +167,7 @@ export default {
       distributionTime: new Date(),
       guestsList: [],
       showPicker: false,
+      serviceMsg: "",
       form1: {
         roomNumber: null,
         guestsId: null,
@@ -177,6 +179,29 @@ export default {
     };
   },
   methods: {
+    openImg(url) {
+      if(url){
+        ImagePreview([url]);
+      }
+    },
+    cashDeposit() {
+      if (this.item.releaseId && this.stock && this.item.unitPrice) {
+        this.axios
+          .post(`/release/calculation/cashDeposit`, {
+            propsId: this.item.releaseId,
+            amount: this.stock,
+            unitPrice: this.item.unitPrice
+          })
+          .then(res => {
+            if (res.data.returnCode == "SUCCESS") {
+              this.serviceMsg = res.data.returnMsg;
+            }
+          })
+          .catch(error => {
+            //捕获失败
+          });
+      }
+    },
     getDelivery() {
       this.axios.post(`/delivery/all`).then(res => {
         if (res.data.returnCode == "SUCCESS") {
@@ -291,11 +316,18 @@ export default {
     }
   },
   mounted() {
+    if (!setOpenId(this.$store.state.openId)) {
+      return false;
+    }
     const id = this.$route.params.id;
     this.releaseType = this.$route.params.releaseType;
+
     this.axios.post(`/release/info/${id}`).then(res => {
       if (res.data.returnCode == "SUCCESS") {
         this.item = res.data.result;
+        if (this.releaseType == 0) {
+          this.cashDeposit();
+        }
       }
     });
     this.getDelivery();
@@ -310,6 +342,13 @@ export default {
         this.guestsList = guestsList;
       }
     });
+  },
+  watch: {
+    stock() {
+      if (this.releaseType == 0) {
+        this.cashDeposit();
+      }
+    }
   }
 };
 </script>
@@ -317,7 +356,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .detail {
-  .resu{
+  .resu {
     color: red;
     font-size: 12px;
     margin-bottom: 20px;
@@ -345,7 +384,7 @@ export default {
     .list-text {
       color: #9096a9;
       font-size: 12px;
-      width: 200px;
+      width: auto;
       float: left;
       margin-left: 10px;
       p:nth-child(1) {

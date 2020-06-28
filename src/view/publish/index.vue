@@ -102,13 +102,18 @@
         />
 
         <van-field
-        v-if="selectClass.customerImg && selectClass.customerImg == 1"
+          v-if="selectClass.customerImg && selectClass.customerImg == 1"
           name="form1.imgUrl"
           label="道具图片"
           :rules="[{ required: true, message: '请填写道具图片' }]"
         >
           <template #input>
-            <van-uploader v-model="customerImg" :max-count="1" :after-read="afterRead" :before-delete="delImg1" />
+            <van-uploader
+              v-model="customerImg"
+              :max-count="1"
+              :after-read="afterRead"
+              :before-delete="delImg1"
+            />
           </template>
         </van-field>
         <van-field v-model="form1.describe" name="道具描述" label="道具描述" placeholder="道具描述" />
@@ -167,7 +172,12 @@
           :rules="[{ required: true, message: '请填写道具图片' }]"
         >
           <template #input>
-            <van-uploader v-model="customerImg2" :max-count="1" :after-read="afterRead2" :before-delete="delImg2" />
+            <van-uploader
+              v-model="customerImg2"
+              :max-count="1"
+              :after-read="afterRead2"
+              :before-delete="delImg2"
+            />
           </template>
         </van-field>
 
@@ -186,10 +196,9 @@
       </van-form>
     </div>
     <div class="footer">
-      <div v-if="selectClass.serviceCharge ||  selectClass.cashDeposit">
+      <div v-if="(selectClass.serviceMsg) && toggleIndex == 2">
         *
-        <span v-if="selectClass.serviceCharge">含{{ selectClass.serviceCharge }}服务费</span>
-        <span v-if="selectClass.cashDeposit">{{ selectClass.cashDeposit }}保证金</span>
+        <span>含{{ selectClass.serviceMsg }}</span>
       </div>
     </div>
 
@@ -240,7 +249,7 @@
 </template>
 
 <script>
-import { TransfromDateTimes, getopenId } from "@/assets/utils";
+import { TransfromDateTimes, setOpenId } from "@/assets/utils";
 export default {
   name: "Index",
   data() {
@@ -292,12 +301,30 @@ export default {
     };
   },
   methods: {
-    delImg1(file,state){
-      this.customerImg.splice(state.index,1);
+    cashDeposit() {
+      if (this.selectClass.id && this.form2.stock && this.form2.unitPrice) {
+        this.axios
+          .post(`/release/calculation/cashDeposit`, {
+            propsId: this.selectClass.id,
+            amount: this.form2.stock,
+            unitPrice: this.form2.unitPrice
+          })
+          .then(res => {
+            if (res.data.returnCode == "SUCCESS") {
+              this.selectClass.serviceMsg = res.data.returnMsg;
+            }
+          })
+          .catch(error => {
+            //捕获失败
+          });
+      }
+    },
+    delImg1(file, state) {
+      this.customerImg.splice(state.index, 1);
       this.form1.imgUrl = [];
     },
-    delImg2(file,state){
-      this.customerImg2.splice(state.index,1);
+    delImg2(file, state) {
+      this.customerImg2.splice(state.index, 1);
       this.form2.imgUrl = [];
     },
     afterRead(files) {
@@ -315,7 +342,7 @@ export default {
         processData: false,
         success: function(data) {
           if (data.returnCode == "SUCCESS") {
-            that.form1.imgUrl =data.result.host + data.result.url;
+            that.form1.imgUrl = data.result.url;
           }
         },
         error: function(data) {
@@ -498,6 +525,9 @@ export default {
     }
   },
   mounted() {
+    if (!setOpenId(this.$store.state.openId)) {
+      return false;
+    }
     this.getDList(1);
     this.getDelivery();
     this.axios.post(`/guestsInfo/all`).then(res => {
@@ -517,6 +547,21 @@ export default {
       let commodityList = JSON.parse(JSON.stringify(this.parescommodityList));
       let arr = commodityList.filter(item => item.name.indexOf(val) != -1);
       this.commodityList = arr;
+    },
+
+    "form2.stock": {
+      handler() {
+        if (this.selectClass.id) {
+          this.cashDeposit();
+        }
+      }
+    },
+    "form2.unitPrice": {
+      handler() {
+        if (this.selectClass.id) {
+          this.cashDeposit();
+        }
+      }
     }
   }
 };

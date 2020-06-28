@@ -39,7 +39,10 @@
             <span>商品描述</span>
             <span></span>
           </li>
-          <li style="height:auto;"><span></span><span style="text-align:left; float:left; line-height:20px;">{{ item.propsDescribe }}</span></li>
+          <li style="height:auto;">
+            <span></span>
+            <span style="text-align:left; float:left; line-height:20px;">{{ item.propsDescribe }}</span>
+          </li>
           <li v-if="item.downShelfTime">
             <span>下架时间</span>
             <span>{{ item.downShelfTime }}</span>
@@ -106,7 +109,9 @@
 </template>
 
 <script>
-import { TransfromDateTimes, getopenId } from "@/assets/utils";
+import { TransfromDateTimes, setOpenId } from "@/assets/utils";
+import { ImagePreview } from "vant";
+
 export default {
   name: "Detail",
   data() {
@@ -118,6 +123,11 @@ export default {
     };
   },
   methods: {
+        openImg(url) {
+      if (url) {
+        ImagePreview([url]);
+      }
+    },
     backFun() {
       this.$router.back(-1);
     },
@@ -205,6 +215,9 @@ export default {
     }
   },
   mounted() {
+    if (!setOpenId(this.$store.state.openId)) {
+      return false;
+    }
     const releaseId = this.$route.params.releaseId;
     this.axios.post(`/user/releaseInfoById/${releaseId}`).then(res => {
       if (res.data.returnCode == "SUCCESS") {
@@ -257,7 +270,7 @@ export default {
     .list-text {
       color: #9096a9;
       font-size: 12px;
-      width: 200px;
+      width: auto;
       float: left;
       margin-left: 10px;
       p:nth-child(1) {

@@ -48,15 +48,18 @@ export default {
 <style scoped lang="scss">
 .footer {
   height: 111px;
-  width: 100%;
+  width: 375px;
+  margin: 0 auto;
   position: relative;
   font-size: 10px;
   .footer-postion {
-    width: 100%;
+    width: 375px;
     height: 111px;
     position: fixed;
     bottom: 0;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
     .footer-main {
       width: 100%;
       height: 111px;

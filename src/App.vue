@@ -15,4 +15,8 @@ export default {
     padding: 0;
     margin: 0;
   }
+  #app{
+    max-width: 375px;
+    margin: 0 auto;
+  }
 </style>

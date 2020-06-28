@@ -27,7 +27,7 @@
             :key="index"
             @click="toDetail(item.id,item.releaseType)"
           >
-            <img :src="item.customerImgUrl || item.propsImg" />
+            <img @click="openImg(item.customerImgUrl)"  :src="item.customerImgUrl || item.propsImg" />
             <div class="list-text">
               <p>
                 {{ item.name }}
@@ -49,6 +49,8 @@
 </template>
 
 <script>
+import { ImagePreview } from "vant";
+
 import {
   getScrollHeight,
   getScrollTop,
@@ -109,6 +111,11 @@ export default {
     };
   },
   methods: {
+        openImg(url) {
+      if(url){
+        ImagePreview([url]);
+      }
+    },
     onRefresh() {
       this.getData(1);
       this.pageNo = 1;
@@ -250,7 +257,7 @@ export default {
       .list-text {
         color: #9096a9;
         font-size: 12px;
-        width: 200px;
+        width: auto;
         float: left;
         margin-left: 10px;
         p:nth-child(1) {

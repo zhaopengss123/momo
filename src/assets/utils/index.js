@@ -20,7 +20,14 @@ import store from '../../store-conf';
     time += ss;
     return time;
 });
-export const getopenId= ()=>{
-    const openId = store.getters().getopenId;
-    return openId;
+export const setOpenId = function (openId){
+    const blon = !!openId;
+    if(!blon){
+        const href_url = "https://" + document.domain;
+         window.location = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxce17baac45d34fc3&redirect_uri=${href_url}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`;
+    }
+    return blon;
 }
+export const getopenId =(()=>{
+    return false;
+})

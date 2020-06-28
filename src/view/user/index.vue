@@ -126,8 +126,7 @@
 
 <script>
 import footerComponent from "@/components/footer";
-import { getopenId } from "@/assets/utils";
-
+import { setOpenId } from "@/assets/utils";
 export default {
   name: "Index",
   data() {
@@ -140,6 +139,9 @@ export default {
   components: { footerComponent },
   methods: {},
   mounted() {
+      if(!setOpenId(this.$store.state.openId)){
+        return false;
+      }
       this.axios.post(`/user/info/${this.$store.state.openId}`).then(res => {
         if (res.data.returnCode == "SUCCESS") {
           this.$store.commit("setUserInfo", res.data.result);

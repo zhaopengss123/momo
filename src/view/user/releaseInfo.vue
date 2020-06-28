@@ -17,7 +17,7 @@
     <div class="list-main">
       <ul>
         <li v-for="(item,index) in dataList" :key="index" @click="toDetail(item.releasePropsId)">
-          <img :src="item.customerImgUrl || item.propsImgUrl" />
+          <img @click="openImg(item.customerImgUrl)" :src="item.customerImgUrl || item.propsImgUrl" />
           <div class="list-text">
             <p>
               {{ item.propsName }}
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-
+import { setOpenId } from "@/assets/utils";
 export default {
   name: "ReleaseInfo",
   data() {
@@ -50,6 +50,11 @@ export default {
     };
   },
   methods: {
+        openImg(url) {
+      if(url){
+        ImagePreview([url]);
+      }
+    },
     backFun() {
       this.$router.back(-1);
     },
@@ -75,6 +80,9 @@ export default {
     }
   },
   mounted() {
+          if(!setOpenId(this.$store.state.openId)){
+        return false;
+      }
     this.getDList(1);
   }
 };
@@ -126,7 +134,7 @@ export default {
       .list-text {
         color: #9096a9;
         font-size: 12px;
-        width: 200px;
+        width: auto;
         float: left;
         margin-left: 10px;
         p:nth-child(1) {
