@@ -196,9 +196,9 @@
       </van-form>
     </div>
     <div class="footer">
-      <div v-if="(selectClass.serviceMsg) && toggleIndex == 2">
+      <div v-if="(serviceMsg) && toggleIndex == 2">
         *
-        <span>含{{ selectClass.serviceMsg }}</span>
+        <span>含{{serviceMsg }}</span>
       </div>
     </div>
 
@@ -297,6 +297,7 @@ export default {
         distributionTime: TransfromDateTimes(),
         openId: this.$store.state.openId
       },
+      serviceMsg: '',
       sceneInfo: `{"h5_info”:{"wap_url”:"https://momo.beituokj.com”,”type”:”Wap”,”wap_name”:”充值支付”}}`
     };
   },
@@ -311,12 +312,14 @@ export default {
           })
           .then(res => {
             if (res.data.returnCode == "SUCCESS") {
-              this.selectClass.serviceMsg = res.data.returnMsg;
+              this.serviceMsg = res.data.returnMsg;
             }
           })
           .catch(error => {
             //捕获失败
           });
+      }else{
+        this.serviceMsg = res.data.returnMsg;
       }
     },
     delImg1(file, state) {
@@ -550,16 +553,17 @@ export default {
     },
 
     "form2.stock": {
-      handler() {
+      handler(val,newval) {
         if (this.selectClass.id) {
-          this.cashDeposit();
+            this.cashDeposit();
+          
         }
       }
     },
     "form2.unitPrice": {
       handler() {
         if (this.selectClass.id) {
-          this.cashDeposit();
+            this.cashDeposit();
         }
       }
     }
