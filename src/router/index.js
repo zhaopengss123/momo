@@ -12,6 +12,8 @@ import ReleaseInfoComponent from '@/view/user/releaseInfo'
 import ReleaseDetailComponent from '@/view/user/list-detail/detail'
 import ShopListComponent from '@/view/user/shop-list'
 import BuyDetailComponent from '@/view/user/list-detail/buydetail'
+import CashDetailComponent from '@/view/user/cash'
+import CashListDetailComponent from '@/view/user/cash-list'
 
 Vue.use(Router)
 
@@ -80,6 +82,16 @@ let router =  new Router({
       path: '/buydetail',
       name: 'Buydetail',
       component: BuyDetailComponent
+    },
+    {
+      path: '/cash',
+      name: 'Cash',
+      component: CashDetailComponent
+    },
+    {
+      path: '/cashlist',
+      name: 'Cashlist',
+      component: CashListDetailComponent
     }
     
     

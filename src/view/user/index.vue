@@ -7,7 +7,7 @@
         <div class="header-top"><span>{{ userInfo.nickName }}</span><span v-if="userInfo.phone">{{ userInfo.phone }}</span><span v-else><router-link to="/bindphone">未绑定 ></router-link></span></div>
         <div class="header-bottom">
           <span>￥{{ userInfo.userTotalPrice || 0 }}</span>
-          <span>去提现 ></span>
+          <span><router-link to="/cash">去提现 ></router-link></span>
         </div>
       </div>
     </div>
@@ -116,11 +116,18 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title" >联系客服</div>
+        <div class="card-title" @click="codeShow = true">联系客服</div>
       </div>
 
     </div>
     <footer-component :activeIndex="2"></footer-component>
+    <van-popup v-model="codeShow" position="bottom" :style="{ height: '330px' }">
+      <div class="code">
+        <img src="../../assets/wx-code.jpg" alt="" srcset="">
+        <span>长按识别二维码添加客服微信</span>
+        </div>
+    </van-popup>
+
   </div>
 </template>
 
@@ -133,7 +140,8 @@ export default {
     return {
       userInfo: {},
       sellNumber:[],
-      buyNumber: []
+      buyNumber: [],
+      codeShow: false
     };
   },
   components: { footerComponent },
@@ -191,6 +199,22 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .index {
+  .code{
+    text-align: center;
+    img{
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+      display: block;
+      padding-top: 50px;
+    }
+    span{
+      text-align: center;
+      padding: 50px;
+      font-size: 14px;
+      color: #333;
+    }
+  }
   .header {
     float: left;
     margin-left: 25px;
