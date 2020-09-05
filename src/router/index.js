@@ -1,22 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import IndexComponent from '@/view/index/index'
-import PublishComponent from '@/view/publish/index'
-import PublishDetailComponent from '@/view/publish/detail'
-import UserComponent from '@/view/user/index'
-import BuyComponent from '@/view/index/buy'
-import SellComponent from '@/view/index/sell'
-import LoginComponent from '@/view/index/login'
-import BindphoneComponent from '@/view/user/bindphone'
-import ReleaseInfoComponent from '@/view/user/releaseInfo'
-import ReleaseDetailComponent from '@/view/user/list-detail/detail'
-import ShopListComponent from '@/view/user/shop-list'
-import BuyDetailComponent from '@/view/user/list-detail/buydetail'
-import CashDetailComponent from '@/view/user/cash'
-import CashListDetailComponent from '@/view/user/cash-list'
+import LoginComponent from '@/view/login'
+import OrderListComponent from '@/view/orderList'
+import EvaluateComponent from '@/view/evaluate'
 
 Vue.use(Router)
-
 let router =  new Router({
   routes: [
     {
@@ -29,72 +17,15 @@ let router =  new Router({
       component: LoginComponent,
     },
     {
-      path: '/index',
-      name: 'Index',
-      component: IndexComponent,
+      path: '/order',
+      name: 'Order',
+      component: OrderListComponent,
     },
     {
-      path: '/buy',
-      name: 'Buy',
-      component: BuyComponent,
-    },
-    {
-      path: '/sell',
-      name: 'Sell',
-      component: SellComponent,
-    },
-    {
-      path: '/publish',
-      name: 'Publish',
-      component: PublishComponent
-    },
-    {
-      path: '/publishdetail',
-      name: 'Publishdetail',
-      component: PublishDetailComponent
-    },
-    {
-      path: '/user',
-      name: 'User',
-      component: UserComponent
-    },
-    {
-      path: '/bindphone',
-      name: 'Bindphone',
-      component: BindphoneComponent
-    },
-    {
-      path: '/releaseInfo',
-      name: 'ReleaseInfo',
-      component: ReleaseInfoComponent
-    },
-    {
-      path: '/releasedetail',
-      name: 'ReleaseDetail',
-      component: ReleaseDetailComponent
-    },
-    {
-      path: '/shoplist',
-      name: 'ShopList',
-      component: ShopListComponent
-    },
-    {
-      path: '/buydetail',
-      name: 'Buydetail',
-      component: BuyDetailComponent
-    },
-    {
-      path: '/cash',
-      name: 'Cash',
-      component: CashDetailComponent
-    },
-    {
-      path: '/cashlist',
-      name: 'Cashlist',
-      component: CashListDetailComponent
+      path: '/evaluate',
+      name: 'Evaluate',
+      component: EvaluateComponent,
     }
-    
-    
   ]
 })
 
