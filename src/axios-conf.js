@@ -24,9 +24,9 @@ export default (Vue , Store) => {
 
     /* ------------------------- 默认请求格式, 和全局请求地址 ------------------------- */
     axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-    const Env = process.env.NODE_ENV === 'production' ? 'build' : 'dev';
-    const Domain = require('../config')[Env].env.domain.replace(/"/g, '');
-    axios.defaults.baseURL = Domain;
+    //const Env = process.env.NODE_ENV === 'production' ? 'build' : 'dev';
+    // const Domain = require('../config')[Env].env.domain.replace(/"/g, '');
+    // axios.defaults.baseURL = Domain;
 
     Vue.use(VueAxios, axios);
 }

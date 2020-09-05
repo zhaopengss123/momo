@@ -50,11 +50,10 @@ export default {
   methods: {
     onSubmit(values) {
       this.axios
-        .post(`/api/app/miniApp/customerLogin`, {
-          phone: this.phone,
-          code: this.code
-        })
+        .get(`/api/app/miniApp/customerLogin?phone=${ this.phone }&code=${ this.code }`)
         .then((res) => {
+          if(res.status != 200){ return  }
+          this.$store.commit('setUserInfo',res.data.data)
           this.$router.push({ path: "/order" });
         });
     },
@@ -65,7 +64,7 @@ export default {
           .get(`/api/app/miniApp/sendSms?phone=${ this.phone }&dataType=0`)
           .then((res) => {
             // 发送成功
-            if (res.data.returnCode == "SUCCESS") {
+            if (res.status == 200) {
               this.$toast.success("发送成功");
               this.setIntervalCode();
             } else {

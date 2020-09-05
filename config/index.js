@@ -3,20 +3,23 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-
 module.exports = {
   dev: {
-
-    // Paths
+    env: require('./dev.env'),
+    port: 8888,
+    autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
-    env: require('./dev.env'),
-
+    // Paths
+    proxyTable: {
+      '/api':{
+        target: 'http://47.111.169.139:8765',
+        changeOrigin: true,
+        pathRewrite: {'^/api' : '/api'}
+      }
+    },
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
-    port: 8080, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
-    autoOpenBrowser: false,
     errorOverlay: true,
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-

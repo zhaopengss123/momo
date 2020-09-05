@@ -3,7 +3,7 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import { NavBar ,Col , Row , Button, Form , Field , Cell, CellGroup, Rate, RadioGroup, Radio, Image as VanImage, Icon, Popup, Dialog, Tag} from 'vant';
+import { NavBar ,Col , Row , Button, Form , Field , Toast , Cell, CellGroup, Rate, RadioGroup, Radio, Image as VanImage, Icon, Popup, Dialog, Tag} from 'vant';
 import 'lib-flexible/flexible'
 import Axios from './axios-conf';
 import stores from './store-conf';
@@ -26,6 +26,7 @@ Vue.use(Icon);
 Vue.use(Popup);
 Vue.use(Dialog);
 Vue.use(Tag);
+Vue.use(Toast);
 Vue.config.productionTip = false
 
 
