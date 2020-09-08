@@ -1,34 +1,50 @@
 <template>
   <div class="evaluate">
-    <van-nav-bar title="评价" left-arrow @click-left="$router.go(-1)" right-text="提交" />
-    <!-- <div class="main">
-      <van-cell title="订单号" value="123456" />
-      <van-cell title="品牌" value="顾家" />
-      <van-cell title="品类" value="顾家" />
-    </div>-->
+      <van-loading size="24px" class="loading" v-if="loading">加载中……</van-loading>
+    <van-nav-bar
+      title="评价"
+      left-arrow
+      @click-left="$router.go(-1)"
+      @click-right="saveEvaluate"
+      v-if="evaluateStatus != 1"
+      right-text="提交"
+    />
+    <van-nav-bar title="评价" left-arrow @click-left="$router.go(-1)" v-if="evaluateStatus == 1" />
     <div class="form">
       <div class="evaluate-list">
         <van-field name="radio" label="安装状态">
           <template #input>
-            <van-radio-group v-model="radio" direction="horizontal">
-              <van-radio name="1">已完成</van-radio>
-              <van-radio name="2">未完成</van-radio>
+            <van-radio-group
+              v-model="formData.install.evaluateStatus"
+              :disabled="evaluateStatus == 1"
+              direction="horizontal"
+            >
+              <van-radio :name="0">已完成</van-radio>
+              <van-radio :name="1">未完成</van-radio>
             </van-radio-group>
           </template>
         </van-field>
         <van-field name="radio" label="是否当天完成">
           <template #input>
-            <van-radio-group v-model="radio" direction="horizontal">
-              <van-radio name="1">是</van-radio>
-              <van-radio name="2">否</van-radio>
+            <van-radio-group
+              v-model="formData.sameDay.evaluateStatus"
+              :disabled="evaluateStatus == 1"
+              direction="horizontal"
+            >
+              <van-radio :name="0">是</van-radio>
+              <van-radio :name="1">否</van-radio>
             </van-radio-group>
           </template>
         </van-field>
         <van-field name="radio" label="是否额外收费">
           <template #input>
-            <van-radio-group v-model="radio" direction="horizontal">
-              <van-radio name="1">是</van-radio>
-              <van-radio name="2">否</van-radio>
+            <van-radio-group
+              v-model="formData.charge.evaluateStatus"
+              :disabled="evaluateStatus == 1"
+              direction="horizontal"
+            >
+              <van-radio :name="0">是</van-radio>
+              <van-radio :name="1">否</van-radio>
             </van-radio-group>
           </template>
         </van-field>
@@ -37,11 +53,16 @@
         <div class="title">您对销售满意吗？</div>
         <van-field name="rate" label="评分">
           <template #input>
-            <van-rate v-model="rate" :size="28" />
+            <van-rate
+              v-model="formData.sale.evaluateStatus"
+              :readonly="evaluateStatus == 1"
+              :size="28"
+            />
           </template>
         </van-field>
         <van-field
-          v-model="text"
+          v-model="formData.sale.remake"
+          :readonly="evaluateStatus == 1"
           rows="2"
           autosize
           label="备注"
@@ -55,11 +76,16 @@
         <div class="title">您对设计师满意吗？</div>
         <van-field name="rate" label="评分">
           <template #input>
-            <van-rate v-model="rate" :size="28" />
+            <van-rate
+              v-model="formData.designer.evaluateStatus"
+              :readonly="evaluateStatus == 1"
+              :size="28"
+            />
           </template>
         </van-field>
         <van-field
-          v-model="text"
+          v-model="formData.designer.remake"
+          :readonly="evaluateStatus == 1"
           rows="2"
           autosize
           label="备注"
@@ -73,11 +99,16 @@
         <div class="title">您对安装服务满意吗？</div>
         <van-field name="rate" label="评分">
           <template #input>
-            <van-rate v-model="rate" :size="28" />
+            <van-rate
+              v-model="formData.services.evaluateStatus"
+              :readonly="evaluateStatus == 1"
+              :size="28"
+            />
           </template>
         </van-field>
         <van-field
-          v-model="text"
+          v-model="formData.services.remake"
+          :readonly="evaluateStatus == 1"
           rows="2"
           autosize
           label="备注"
@@ -89,22 +120,22 @@
       </div>
       <div class="evaluate-list">
         <div class="title">签名</div>
-        <van-field name="rate" v-if="canvasUrl" label="您的签名">
+        <van-field name="rate" v-if="formData.signature.remake" label="您的签名">
           <template #input>
-            <van-image width="100%" :src="canvasUrl" >
-                <template v-slot:canvasUrl>
-                  <van-loading type="spinner" size="20" />
-                </template>
+            <van-image width="100%" :src="formData.signature.remake">
+              <template v-slot:canvasUrl>
+                <van-loading type="spinner" size="20" />
+              </template>
             </van-image>
           </template>
         </van-field>
-        <van-cell name="rate" title="操作">
+        <van-cell name="rate" title="操作" v-if="evaluateStatus != 1">
           <template #right-icon>
             <van-button
               type="primary"
               size="mini"
               @click="handleCanvas"
-            >{{ canvasUrl ? '重新签名' : '去签名' }}</van-button>
+            >{{ formData.signature.remake ? '重新签名' : '去签名' }}</van-button>
           </template>
         </van-cell>
       </div>
@@ -128,22 +159,144 @@ export default {
   name: "examine",
   data() {
     return {
-      formData: {},
       rate: 2,
       text: "",
       radio: 1,
       show: false,
       ctx: null,
+      loading: false,
       canvas: null,
       canvasMoveUse: false,
       canvasUrl: null,
+      evaluateStatus: 0,
       baseFile: null,
+      orderInfo: {},
+      installOrderEvaluatesDetail: {
+        installOrderEvaluates: [
+          {
+            evaluateStatus: "0",
+            evaluateLabel: "安装状态",
+            evaluateType: 1,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: "0",
+            evaluateLabel: "是否当天完成",
+            evaluateType: 2,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: "0",
+            evaluateLabel: "是否有额外收费",
+            evaluateType: 3,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: "0",
+            evaluateLabel: "安装师傅是否有穿工服和鞋套",
+            evaluateType: 4,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: "0",
+            evaluateLabel: "货品是否有损坏",
+            evaluateType: 5,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: "一天",
+            evaluateLabel: "安装周期",
+            evaluateType: 10,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: 5,
+            evaluateLabel: "设计师评分",
+            evaluateType: 6,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: 5,
+            evaluateLabel: "安装服务评分",
+            evaluateType: 7,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: 5,
+            evaluateLabel: "销售评分",
+            evaluateType: 9,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: "",
+            evaluateLabel: "反馈意见",
+            evaluateType: 8,
+            remake: "",
+            customerServiceId: null,
+          },
+          {
+            evaluateStatus: "",
+            evaluateLabel: "签名图片",
+            evaluateType: 11,
+            remake: "",
+            customerServiceId: null,
+          },
+        ],
+        installationOrderId: null,
+        createAt: null,
+      },
+      formData: {
+        install: {
+          evaluateStatus: 0,
+          remake: "",
+          evaluateType: 1,
+        },
+        sameDay: {
+          evaluateStatus: 0,
+          remake: "",
+          evaluateType: 2,
+        },
+        charge: {
+          evaluateStatus: 0,
+          remake: "",
+          evaluateType: 3,
+        },
+        sale: {
+          evaluateStatus: 5,
+          remake: "",
+          evaluateType: 9,
+        },
+        designer: {
+          evaluateStatus: 5,
+          remake: "",
+          evaluateType: 6,
+        },
+        services: {
+          evaluateStatus: 5,
+          remake: "",
+          evaluateType: 7,
+        },
+        signature: {
+          remake: "",
+          evaluateType: 11,
+        },
+      },
     };
   },
   components: { canvascomponent },
   methods: {
     handleCanvas() {
       document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
       this.show = true;
     },
     saveCanvas(url) {
@@ -152,17 +305,110 @@ export default {
       this.baseFile = base64toFile(url);
       put(this.baseFile).then((data) => {
         this.canvasUrl = data.url;
-        console.log(data.url);
-      })
+        this.formData.signature.remake = data.url;
+      });
+    },
+    /**
+     * 获取评价详情
+     */
+    getEvaluateDetail() {
+      this.axios
+        .get(
+          `/api/app/orderEvaluater/listInstallOrderEvaluate?source=0&customerServiceId=${this.orderInfo.customerServiceId}`
+        )
+        .then((res) => {
+          if (res.status == 200 && res.data.data) {
+            this.installOrderEvaluatesDetail.installOrderEvaluates =
+              res.data.data;
+            const data = res.data.data;
+            const keys = Object.keys(this.formData);
+            const values = Object.values(this.formData);
+            data.map((item) => {
+              values.map((val, index) => {
+                if (item.evaluateType == val.evaluateType) {
+                  this.formData[
+                    keys[index]
+                  ].evaluateStatus = item.evaluateStatus
+                    ? Number(item.evaluateStatus)
+                    : null;
+                  this.formData[keys[index]].remake = item.remake || null;
+                }
+              });
+            });
+            console.log(this.formData)
+          }
+        });
+    },
+    /** 提交评价 */
+    saveEvaluate() {
+      const keys = Object.keys(this.formData);
+      const values = Object.values(this.formData);
+      let installOrderEvaluatesDetail = JSON.parse(
+        JSON.stringify(this.installOrderEvaluatesDetail)
+      );
+
+      installOrderEvaluatesDetail.installOrderEvaluates.map((item) => {
+        values.map((val, index) => {
+          if (item.evaluateType == val.evaluateType) {
+            console.log(item,val.evaluateStatus)
+            item.evaluateStatus = val.evaluateStatus ;
+            item.remake = val.remake || null;
+          }
+        });
+      });
+      if (!this.formData.signature.remake) {
+        this.$toast.fail("请签上您的名字~");
+        return false;
+      }
+      this.loading = true;
+      this.axios
+        .post(
+          `/api/app/orderEvaluater/addInstallOrderEvaluateFromCustomer`,
+          installOrderEvaluatesDetail
+        )
+        .then((res) => {
+          this.loading = false;
+          if (res.status == 200) {
+            this.$toast.success("评价成功！");
+            this.$router.go(-1);
+          }
+        }).catch(err=>{ this.loading = false; });
     },
   },
-  mounted() {},
+  mounted() {
+    const orderInfo = this.$route.query.item;
+    this.orderInfo = orderInfo;
+    this.installOrderEvaluatesDetail.installOrderEvaluates.map((item) => {
+      item.customerServiceId = orderInfo.customerServiceId;
+    });
+    this.installOrderEvaluatesDetail.createAt = this.$store.state.userInfo.customerId;
+    this.installOrderEvaluatesDetail.installationOrderId =
+      orderInfo.installationOrderId;
+    this.evaluateStatus = orderInfo.evaluateStatus;
+    if (orderInfo.evaluateStatus == 1) {
+      this.getEvaluateDetail();
+    }
+  },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .evaluate {
+
+    .loading {
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      text-align: center;
+      span {
+        margin-top: 40%;
+      }
+  }
   .van-nav-bar {
     position: fixed;
     top: 0;

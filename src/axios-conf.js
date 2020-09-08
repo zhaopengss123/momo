@@ -9,7 +9,7 @@ import Qs from 'qs';
 export default (Vue , Store) => {
     axios.interceptors.request.use(res => {
         /* ------------ 序列化参数 ------------- */
-        if (res.method === 'post') res.data = Qs.stringify(res.data);
+        // if (res.method === 'post') res.data = Qs.stringify(res.data);
         res.timeout = 15000;
         return res;
     });

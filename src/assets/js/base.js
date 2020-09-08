@@ -1,3 +1,4 @@
+var OSS = require('ali-oss');
 /**
 * @description: base64位图片转码文件流
 * @param {type}
