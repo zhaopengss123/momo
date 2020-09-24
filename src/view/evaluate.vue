@@ -1,6 +1,6 @@
 <template>
   <div class="evaluate">
-      <van-loading size="24px" class="loading" v-if="loading">加载中……</van-loading>
+    <van-loading size="24px" class="loading" v-if="loading">加载中……</van-loading>
     <van-nav-bar
       title="评价"
       left-arrow
@@ -12,39 +12,39 @@
     <van-nav-bar title="评价" left-arrow @click-left="$router.go(-1)" v-if="evaluateStatus == 1" />
     <div class="form">
       <div class="evaluate-list">
-        <van-field name="radio" label="安装状态">
+        <van-field name="radio" error required label="安装状态">
           <template #input>
             <van-radio-group
               v-model="formData.install.evaluateStatus"
               :disabled="evaluateStatus == 1"
               direction="horizontal"
             >
-              <van-radio :name="0">已完成</van-radio>
-              <van-radio :name="1">未完成</van-radio>
+              <van-radio :name="1">已完成</van-radio>
+              <van-radio :name="0">未完成</van-radio>
             </van-radio-group>
           </template>
         </van-field>
-        <van-field name="radio" label="是否当天完成">
+        <van-field name="radio" error required label="是否当天完成">
           <template #input>
             <van-radio-group
               v-model="formData.sameDay.evaluateStatus"
               :disabled="evaluateStatus == 1"
               direction="horizontal"
             >
-              <van-radio :name="0">是</van-radio>
-              <van-radio :name="1">否</van-radio>
+              <van-radio :name="1">是</van-radio>
+              <van-radio :name="0">否</van-radio>
             </van-radio-group>
           </template>
         </van-field>
-        <van-field name="radio" label="是否额外收费">
+        <van-field name="radio" error required label="是否额外收费">
           <template #input>
             <van-radio-group
               v-model="formData.charge.evaluateStatus"
               :disabled="evaluateStatus == 1"
               direction="horizontal"
             >
-              <van-radio :name="0">是</van-radio>
-              <van-radio :name="1">否</van-radio>
+              <van-radio :name="1">是</van-radio>
+              <van-radio :name="0">否</van-radio>
             </van-radio-group>
           </template>
         </van-field>
@@ -169,6 +169,7 @@ export default {
       canvasMoveUse: false,
       canvasUrl: null,
       evaluateStatus: 0,
+      initStatus: null,
       baseFile: null,
       orderInfo: {},
       installOrderEvaluatesDetail: {
@@ -191,20 +192,6 @@ export default {
             evaluateStatus: "0",
             evaluateLabel: "是否有额外收费",
             evaluateType: 3,
-            remake: "",
-            customerServiceId: null,
-          },
-          {
-            evaluateStatus: "0",
-            evaluateLabel: "安装师傅是否有穿工服和鞋套",
-            evaluateType: 4,
-            remake: "",
-            customerServiceId: null,
-          },
-          {
-            evaluateStatus: "0",
-            evaluateLabel: "货品是否有损坏",
-            evaluateType: 5,
             remake: "",
             customerServiceId: null,
           },
@@ -256,17 +243,17 @@ export default {
       },
       formData: {
         install: {
-          evaluateStatus: 0,
+          evaluateStatus: null,
           remake: "",
           evaluateType: 1,
         },
         sameDay: {
-          evaluateStatus: 0,
+          evaluateStatus: null,
           remake: "",
           evaluateType: 2,
         },
         charge: {
-          evaluateStatus: 0,
+          evaluateStatus: null,
           remake: "",
           evaluateType: 3,
         },
@@ -317,9 +304,14 @@ export default {
           `/api/app/orderEvaluater/listInstallOrderEvaluate?source=0&customerServiceId=${this.orderInfo.customerServiceId}`
         )
         .then((res) => {
-          if (res.status == 200 && res.data.data) {
+          if (res.status == 200 && res.data.data && res.data.data.length) {
             this.installOrderEvaluatesDetail.installOrderEvaluates =
               res.data.data;
+            this.installOrderEvaluatesDetail.installOrderEvaluates.map(
+              (item) => {
+                item.customerServiceId = this.orderInfo.customerServiceId;
+              }
+            );
             const data = res.data.data;
             const keys = Object.keys(this.formData);
             const values = Object.values(this.formData);
@@ -335,7 +327,8 @@ export default {
                 }
               });
             });
-            console.log(this.formData)
+            const formData = this.formData;
+            this.initStatus = formData.install.evaluateStatus;
           }
         });
     },
@@ -346,16 +339,21 @@ export default {
       let installOrderEvaluatesDetail = JSON.parse(
         JSON.stringify(this.installOrderEvaluatesDetail)
       );
-
+      if(this.formData.install.evaluateStatus == null){ this.$toast.fail("请选择安装状态"); return ;}
+      if(this.formData.sameDay.evaluateStatus == null){ this.$toast.fail("请选择是否当天完成"); return ;}
+      if(this.formData.charge.evaluateStatus == null){ this.$toast.fail("请选择是否额外收费"); return ;}
       installOrderEvaluatesDetail.installOrderEvaluates.map((item) => {
         values.map((val, index) => {
           if (item.evaluateType == val.evaluateType) {
-            console.log(item,val.evaluateStatus)
-            item.evaluateStatus = val.evaluateStatus ;
+            item.evaluateStatus = val.evaluateStatus;
             item.remake = val.remake || null;
           }
         });
       });
+      if (this.initStatus == 0 && this.formData.install.evaluateStatus == 0) {
+        this.$toast.fail("您已经评价过安装未完成了~");
+        return false;
+      }
       if (!this.formData.signature.remake) {
         this.$toast.fail("请签上您的名字~");
         return false;
@@ -372,7 +370,10 @@ export default {
             this.$toast.success("评价成功！");
             this.$router.go(-1);
           }
-        }).catch(err=>{ this.loading = false; });
+        })
+        .catch((err) => {
+          this.loading = false;
+        });
     },
   },
   mounted() {
@@ -385,9 +386,8 @@ export default {
     this.installOrderEvaluatesDetail.installationOrderId =
       orderInfo.installationOrderId;
     this.evaluateStatus = orderInfo.evaluateStatus;
-    if (orderInfo.evaluateStatus == 1) {
-      this.getEvaluateDetail();
-    }
+
+    this.getEvaluateDetail();
   },
 };
 </script>
@@ -395,19 +395,18 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .evaluate {
-
-    .loading {
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 100;
-      text-align: center;
-      span {
-        margin-top: 40%;
-      }
+  .loading {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    text-align: center;
+    span {
+      margin-top: 40%;
+    }
   }
   .van-nav-bar {
     position: fixed;
