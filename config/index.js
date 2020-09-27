@@ -13,14 +13,14 @@ module.exports = {
     // Paths
     proxyTable: {
       '/api':{
-        //target: 'http://47.111.169.139:8765',
-        target: 'http://192.168.3.44:8765',
+        target: 'http://47.111.169.139:8765',
+        //target: 'http://192.168.3.44:8765',
         changeOrigin: true,
         pathRewrite: {'^/api' : '/api'}
       }
     },
     // Various Dev Server settings
-    host: 'localhost', // can be overwritten by process.env.HOST
+    host: '0.0.0.0', // can be overwritten by process.env.HOST
     errorOverlay: true,
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-

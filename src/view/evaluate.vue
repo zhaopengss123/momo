@@ -6,13 +6,14 @@
       left-arrow
       @click-left="$router.go(-1)"
       @click-right="saveEvaluate"
-      v-if="evaluateStatus != 1"
+      v-if="evaluateStatus != 1 && isDelete != 1"
       right-text="提交"
     />
-    <van-nav-bar title="评价" left-arrow @click-left="$router.go(-1)" v-if="evaluateStatus == 1" />
+    <van-nav-bar title="查看评价" left-arrow @click-left="$router.go(-1)" @click-right="toHistory" right-text="历史评价" v-if="evaluateStatus == 1 && isDelete == 0" />
+    <van-nav-bar title="查看历史评价" left-arrow @click-left="isDelete = 0" v-if="evaluateStatus == 1 && isDelete == 1" />
     <div class="form">
       <div class="evaluate-list">
-        <van-field name="radio" error required label="安装状态">
+        <van-field name="radio"  required label="安装状态">
           <template #input>
             <van-radio-group
               v-model="formData.install.evaluateStatus"
@@ -24,7 +25,7 @@
             </van-radio-group>
           </template>
         </van-field>
-        <van-field name="radio" error required label="是否当天完成">
+        <van-field name="radio"  required label="是否当天完成">
           <template #input>
             <van-radio-group
               v-model="formData.sameDay.evaluateStatus"
@@ -36,7 +37,7 @@
             </van-radio-group>
           </template>
         </van-field>
-        <van-field name="radio" error required label="是否额外收费">
+        <van-field name="radio"  required label="是否额外收费">
           <template #input>
             <van-radio-group
               v-model="formData.charge.evaluateStatus"
@@ -172,6 +173,7 @@ export default {
       initStatus: null,
       baseFile: null,
       orderInfo: {},
+      isDelete: 0,
       installOrderEvaluatesDetail: {
         installOrderEvaluates: [
           {
@@ -281,6 +283,9 @@ export default {
   },
   components: { canvascomponent },
   methods: {
+    toHistory(){
+      this.isDelete = 1;
+    },
     handleCanvas() {
       document.documentElement.scrollTop = 0;
       document.body.scrollTop = 0;
@@ -301,18 +306,33 @@ export default {
     getEvaluateDetail() {
       this.axios
         .get(
-          `/api/app/orderEvaluater/listInstallOrderEvaluate?source=0&customerServiceId=${this.orderInfo.customerServiceId}`
+          `/api/app/orderEvaluater/listInstallOrderEvaluate?source=0&customerServiceId=${this.orderInfo.customerServiceId}&isDelete=${ this.isDelete }`
         )
         .then((res) => {
-          if (res.status == 200 && res.data.data && res.data.data.length) {
-            this.installOrderEvaluatesDetail.installOrderEvaluates =
-              res.data.data;
+          this.listData = res.data.data;
+          if(res.status == 200){
+            this.editorData();
+          }else{
+            this.$toast.fail(res.message || '网络错误');
+          }
+          
+        });
+    },
+    editorData(){
+          let datas = [];
+          if(this.isDelete == 0 && this.listData && this.listData.nowList ){
+            datas = this.listData.nowList
+          }else if(this.isDelete == 1 && this.listData && this.listData.historyList){
+            datas = this.listData.historyList
+          }
+          if ( datas.length) {
+            this.installOrderEvaluatesDetail.installOrderEvaluates = datas;
             this.installOrderEvaluatesDetail.installOrderEvaluates.map(
               (item) => {
                 item.customerServiceId = this.orderInfo.customerServiceId;
               }
             );
-            const data = res.data.data;
+            const data = datas;
             const keys = Object.keys(this.formData);
             const values = Object.values(this.formData);
             data.map((item) => {
@@ -330,7 +350,6 @@ export default {
             const formData = this.formData;
             this.initStatus = formData.install.evaluateStatus;
           }
-        });
     },
     /** 提交评价 */
     saveEvaluate() {
@@ -376,7 +395,13 @@ export default {
         });
     },
   },
+  watch:{
+    isDelete(){
+      this.editorData();
+    }
+  },
   mounted() {
+    if(this.$route.query.isDelete){ this.isDelete = 1;  }
     const orderInfo = this.$route.query.item;
     this.orderInfo = orderInfo;
     this.installOrderEvaluatesDetail.installOrderEvaluates.map((item) => {
