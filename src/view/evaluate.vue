@@ -11,6 +11,10 @@
     />
     <van-nav-bar title="查看评价" left-arrow @click-left="$router.go(-1)" @click-right="toHistory" right-text="历史评价" v-if="evaluateStatus == 1 && isDelete == 0" />
     <van-nav-bar title="查看历史评价" left-arrow @click-left="isDelete = 0" v-if="evaluateStatus == 1 && isDelete == 1" />
+    
+    <div class="title-text">
+      尊敬的用户：您好！感谢您选择我们的产品，请您在产品安装完毕后，客观的对我们的服务进行评价，并提出宝贵的建议，让我们能为您提供更好的服务，祝您生活愉快！
+    </div>
     <div class="form">
       <div class="evaluate-list">
         <van-field name="radio"  required label="安装状态">
@@ -432,6 +436,12 @@ export default {
     span {
       margin-top: 40%;
     }
+  }
+  .title-text{
+    width: 90%;
+    margin: 0 auto;
+    color: #919BA5;
+    margin-top: 10px;
   }
   .van-nav-bar {
     position: fixed;
